@@ -1,5 +1,5 @@
 {
-  "name": "brease-tools",
+  "name": "@manavian/brease-tools",
   "version": "0.0.1",
   "description": "Brease preview tools",
   "main": "index.ts",
