@@ -1,0 +1,11 @@
+header{
+    display:none; /* Hide the header in preview mode */
+}
+figure{
+    max-height:unset;
+    overflow: unset;
+}
+figure.BreaseSectionHide{
+    max-height:48px;
+    overflow: hidden;
+}
