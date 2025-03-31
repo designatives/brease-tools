@@ -1,6 +1,5 @@
-import './style.css'
 import {BreaseEditButton} from "./SectionEditButton";
-export function SectionToolbar({data}) {
+export function SectionToolbar({data}:{data:any}) {
     return <div className={'BreaseSectionToolbar'}>
         <div className={''}>
             <span className={'BreaseSectionTitle'}>{data.name}</span>

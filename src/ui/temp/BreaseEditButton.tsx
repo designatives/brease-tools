@@ -1,6 +1,4 @@
 'use client'
-import React from 'react'
-
 function BreaseAction(action: string, data: any) {
   window.parent.postMessage(
     {
