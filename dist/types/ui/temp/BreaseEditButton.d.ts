@@ -1,6 +1,7 @@
 interface BreaseEditButtonProps {
     id: string;
 }
-declare const BreaseEditButton: ({ id }: BreaseEditButtonProps) => import("react/jsx-runtime").JSX.Element;
-export default BreaseEditButton;
+export declare function createBreaseEditButton({ id }: BreaseEditButtonProps): HTMLButtonElement;
+export declare function insertBreaseEditButton(container: HTMLElement, id: string): HTMLButtonElement;
+export {};
 //# sourceMappingURL=BreaseEditButton.d.ts.map

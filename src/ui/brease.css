@@ -5,13 +5,13 @@ figure{
     max-height:unset;
     overflow: unset;
 }
-figure.BreaseSectionHide{
+figure.brease-section-hide{
     max-height:48px;
     overflow: hidden;
 }
 
 
-.BreaseSectionToolbar{
+.brease-section-toolbar{
     background-color: rgba(245, 246, 248, 0.6);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
@@ -27,18 +27,18 @@ figure.BreaseSectionHide{
     top:0
 }
 
-.BreaseSectionToolbar .BreaseSectionTitle{
+.brease-section-toolbar .brease-section-title{
     font-weight:500;
     color:#282B32;
 }
 
-.BreaseSectionToolbar .BreaseToolbarActions{
+.brease-section-toolbar .brease-toolbar-actions{
     display: flex;
     align-items: center;
     gap: 12px;
 }
 
-.BreaseSectionToolbar .BreaseEditButton{
+.brease-section-toolbar .brease-edit-button{
     background-color: #07080A;
     border: none;
     border-radius: 44px;
@@ -52,7 +52,7 @@ figure.BreaseSectionHide{
     display: flex;
 }
 
-.BreaseSectionToolbar .BreaseToggleSectionButton{
+.brease-section-toolbar .brease-toggle-section-button{
     background-color: #FFFFFF;
     border: 1px solid #E2E4EA;
     border-radius: 50%;
@@ -64,19 +64,19 @@ figure.BreaseSectionHide{
     display: flex;
 }
 
-.BreaseSectionToolbar .BreaseToggleSectionButton svg {
+.brease-section-toolbar .brease-toggle-section-button svg {
     transform:rotate(180deg);
     transition:300ms transform ease-in-out;
     pointer-events: none;
 }
-.BreaseSectionToolbar .BreaseToggleSectionButton[data-open="false"] svg {
+.brease-section-toolbar .brease-toggle-section-button[data-open="false"] svg {
     transform:rotate(0deg);
 }
 
-.BreaseSectionToolbar + section{
+.brease-section-toolbar + section{
     opacity:1;
     transition:500ms opacity ease-in-out, 500ms margin ease-in-out;
 }
-.BreaseSectionToolbar:hover + section{
+.brease-section-toolbar:hover + section{
     opacity:0.6;
 }
