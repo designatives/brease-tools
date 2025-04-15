@@ -13,4 +13,3 @@ declare function createBreaseEditButton({ id }: BreaseEditButtonProps): HTMLButt
 declare function insertBreaseEditButton(container: HTMLElement, id: string): HTMLButtonElement;
 
 export { createBreaseEditButton, createSectionToolbar, insertBreaseEditButton, insertSectionToolbar };
-export type { SectionToolbarData };

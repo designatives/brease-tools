@@ -8,7 +8,7 @@ import postcss from 'rollup-plugin-postcss'
 
 export default [
     {
-        input: "src/index-with-styles.ts",
+        input: "src/index.ts",
         output: [
             { file: "dist/index.js", format: "cjs", sourcemap: true },
             { file: "dist/index.es.js", format: "esm", sourcemap: true }
@@ -20,7 +20,9 @@ export default [
             postcss({
                 extract: true,
                 minimize: true,
-                modules: true,
+                modules: false,
+                sourceMap: true,
+                extensions: ['.css']
             }),
             typescript({ tsconfig: "./tsconfig.json" })
         ],
@@ -29,6 +31,17 @@ export default [
     {
         input: "dist/types/index.d.ts",
         output: [{ file: "dist/index.d.ts", format: "esm" }],
-        plugins: [dts()]
+        plugins: [
+            dts(),
+            {
+                name: 'remove-css-imports',
+                resolveId(source) {
+                    if (source.endsWith('.css')) {
+                        return {id: source, external: true};
+                    }
+                    return null;
+                }
+            }
+        ]
     }
 ];
