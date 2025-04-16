@@ -10,7 +10,7 @@ export default [
     {
         input: "src/index.ts",
         output: [
-            { file: "dist/index.js", format: "cjs", sourcemap: true },
+            { file: "dist/index.cjs", format: "cjs", sourcemap: true },
             { file: "dist/index.es.js", format: "esm", sourcemap: true }
         ],
         plugins: [
@@ -18,11 +18,11 @@ export default [
             resolve(),
             commonjs(),
             postcss({
-                extract: true,
+                extract: false,
                 minimize: true,
                 modules: false,
                 sourceMap: true,
-                extensions: ['.css']
+                extensions: ['.css', '.scss']
             }),
             typescript({ tsconfig: "./tsconfig.json" })
         ],
@@ -36,7 +36,7 @@ export default [
             {
                 name: 'remove-css-imports',
                 resolveId(source) {
-                    if (source.endsWith('.css')) {
+                    if (source.endsWith('.css') || source.endsWith('.scss')) {
                         return {id: source, external: true};
                     }
                     return null;

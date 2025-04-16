@@ -1,5 +1,7 @@
-import { jsx, jsxs } from 'react/jsx-runtime';
-import React from 'react';
+'use strict';
+
+var jsxRuntime = require('react/jsx-runtime');
+var React = require('react');
 
 function styleInject(css, ref) {
   if ( ref === void 0 ) ref = {};
@@ -55,11 +57,11 @@ const BreaseEditButton = ({ id }) => {
             }
         };
     }, [id]);
-    return (jsx("button", { ref: buttonRef, className: 'brease-edit-button', children: "Edit" }));
+    return (jsxRuntime.jsx("button", { ref: buttonRef, className: 'brease-edit-button', children: "Edit" }));
 };
 
 function SectionToolbar({ data }) {
-    return jsxs("div", { className: 'brease-section-toolbar', children: [jsx("div", { children: jsx("span", { className: 'brease-section-title', children: data.name }) }), jsx("div", { className: 'brease-toolbar-actions', children: jsx(BreaseEditButton, { id: data.uuid }) })] });
+    return jsxRuntime.jsxs("div", { className: 'brease-section-toolbar', children: [jsxRuntime.jsx("div", { children: jsxRuntime.jsx("span", { className: 'brease-section-title', children: data.name }) }), jsxRuntime.jsx("div", { className: 'brease-toolbar-actions', children: jsxRuntime.jsx(BreaseEditButton, { id: data.uuid }) })] });
 }
 
 function initReactBrease() {
@@ -76,5 +78,10 @@ function getTSVersion() {
     return "Brease 0.0.1";
 }
 
-export { BreaseEditButton, SectionToolbar, getReactVersion, getTSVersion, initReactBrease, initTSBrease };
-//# sourceMappingURL=index.es.js.map
+exports.BreaseEditButton = BreaseEditButton;
+exports.SectionToolbar = SectionToolbar;
+exports.getReactVersion = getReactVersion;
+exports.getTSVersion = getTSVersion;
+exports.initReactBrease = initReactBrease;
+exports.initTSBrease = initTSBrease;
+//# sourceMappingURL=index.cjs.map

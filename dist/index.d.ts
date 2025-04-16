@@ -1,15 +1,18 @@
-interface SectionToolbarData {
-    name: string;
-    uuid: string;
-    [key: string]: any;
-}
-declare function createSectionToolbar(data: SectionToolbarData): HTMLDivElement;
-declare function insertSectionToolbar(parent: HTMLElement, data: SectionToolbarData): HTMLDivElement;
+import * as react_jsx_runtime from 'react/jsx-runtime';
+
+declare function SectionToolbar({ data }: {
+    data: any;
+}): react_jsx_runtime.JSX.Element;
 
 interface BreaseEditButtonProps {
     id: string;
 }
-declare function createBreaseEditButton({ id }: BreaseEditButtonProps): HTMLButtonElement;
-declare function insertBreaseEditButton(container: HTMLElement, id: string): HTMLButtonElement;
+declare const BreaseEditButton: ({ id }: BreaseEditButtonProps) => react_jsx_runtime.JSX.Element;
 
-export { createBreaseEditButton, createSectionToolbar, insertBreaseEditButton, insertSectionToolbar };
+declare function initReactBrease(): boolean;
+declare function getReactVersion(): string;
+
+declare function initTSBrease(): boolean;
+declare function getTSVersion(): string;
+
+export { BreaseEditButton, SectionToolbar, getReactVersion, getTSVersion, initReactBrease, initTSBrease };
