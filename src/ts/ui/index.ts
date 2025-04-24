@@ -1,14 +1,5 @@
-export function initTSBrease() {
-
-    return true;
-    // TODO: Implement authentication check
-    if (typeof window !== 'undefined') {
-        console.log('OK')
-        return window.location.search.includes('breaseToken');
-    }
-    return false;
-}
-
-export function getTSVersion() {
-    return "Brease 0.0.1"
-}
+export { createSectionToolbar } from './SectionToolbar';
+export { createBreaseEditButton } from './SectionToolbar/SectionEditButton';
+export { insertSectionToolbar } from './SectionToolbar';
+export { insertBreaseEditButton } from './SectionToolbar/SectionEditButton';
+export { handlePreviewMode } from './SectionToolbar'

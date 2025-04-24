@@ -1,14 +1,26 @@
 /* Base element styling */
-header {
-    display: none; /* Hide the header in preview mode */
+.brease-preview-hidden {
+    display: none;
 }
 
-figure {
+.brease-section {
+    position: relative;
     max-height: unset;
     overflow: unset;
 }
 
-figure.brease-section-hide {
+.brease-preview-overlay{
+    position: absolute;
+    height: 100%;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: transparent;
+    z-index: 9999;
+}
+
+.brease-section-hide {
     max-height: 48px;
     overflow: hidden;
 }

@@ -1,3 +1,4 @@
+import 'styles/index.css'
 import { createBreaseEditButton } from "./SectionEditButton";
 
 export interface SectionToolbarData {
@@ -38,5 +39,24 @@ export function insertSectionToolbar(parent: HTMLElement, data: SectionToolbarDa
     const toolbar = createSectionToolbar(data);
     parent.appendChild(toolbar);
     return toolbar;
+}
+
+// Helper to handle preview mode
+export function handlePreviewMode(breaseNavigation: HTMLElement, breaseSections: HTMLElement[]) {
+    let auth = true //TODO
+    if(auth){
+        breaseNavigation.classList.add('brease-preview-hidden')
+        breaseSections.map((section) => {
+            const previewOverlay = document.createElement('div')
+            previewOverlay.classList.add('brease-preview-overlay')
+            section.appendChild(previewOverlay)
+        })
+    } else {
+        breaseNavigation.classList.remove('brease-preview-hidden')
+        const overlays = document.getElementsByClassName('brease-preview-overlay')
+        Array.from(overlays).forEach(overlay => {
+            if(overlay.parentNode) overlay.parentNode.removeChild(overlay)
+        })
+    }
 }
 

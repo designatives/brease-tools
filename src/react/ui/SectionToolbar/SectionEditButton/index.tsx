@@ -1,3 +1,4 @@
+import 'styles/index.css'
 import React from 'react';
 
 interface BreaseEditButtonProps {

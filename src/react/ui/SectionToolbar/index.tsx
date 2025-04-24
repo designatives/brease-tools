@@ -1,3 +1,4 @@
+import 'styles/index.css'
 import {BreaseEditButton} from "./SectionEditButton";
 
 export function SectionToolbar({data}:{data:any}) {
