@@ -158,16 +158,20 @@ function insertSectionToolbar(parent, data) {
 }
 
 // src/ts/brease.ts
-var isServer = typeof window === "undefined";
-var globalConfig = null;
-var serverInstance = null;
-var clientInstance = null;
+var INSTANCE_KEY = Symbol.for("brease.instance");
+var getGlobalThis = () => {
+  if (typeof globalThis !== "undefined") return globalThis;
+  if (typeof self !== "undefined") return self;
+  if (typeof window !== "undefined") return window;
+  if (typeof global !== "undefined") return global;
+  throw new Error("Unable to locate global object");
+};
 var Brease = class {
-  constructor(config) {
-    this.token = config.token;
-    this.apiUrl = config?.apiUrl || "https://api.brease.io/v1";
-    this.baseEnvironment = config.environment;
-    this.baseProxyUrl = config?.proxyUrl || "/api/brease";
+  constructor(breaseConfig) {
+    this.token = breaseConfig.token;
+    this.apiUrl = breaseConfig?.apiUrl || "https://api.brease.io/v1";
+    this.baseEnvironment = breaseConfig.environment;
+    this.baseProxyUrl = breaseConfig?.proxyUrl || "/api/brease";
   }
   // Server-side: Direct API call with token
   async fetchServerData(url) {
@@ -189,6 +193,7 @@ var Brease = class {
     return await response.json();
   }
   async getPage(pageId) {
+    const isServer = typeof window === "undefined";
     if (isServer) {
       const response = await this.fetchServerData(
         `/environments/${this.baseEnvironment}/pages/${pageId}`
@@ -203,6 +208,7 @@ var Brease = class {
     }
   }
   async getCollection(collectionId) {
+    const isServer = typeof window === "undefined";
     if (isServer) {
       const response = await this.fetchServerData(
         `/environments/${this.baseEnvironment}/collections/${collectionId}`
@@ -217,6 +223,7 @@ var Brease = class {
     }
   }
   async getNavigation(navigationId) {
+    const isServer = typeof window === "undefined";
     if (isServer) {
       const response = await this.fetchServerData(
         `/environments/${this.baseEnvironment}/navigations/${navigationId}`
@@ -231,36 +238,22 @@ var Brease = class {
     }
   }
 };
-function init(config) {
-  globalConfig = config;
-  if (isServer) {
-    serverInstance = new Brease(config);
-    return serverInstance;
-  } else {
-    if (!clientInstance) {
-      clientInstance = new Brease(config);
-    }
-    return clientInstance;
-  }
+function init(breaseConfig) {
+  const globalObj = getGlobalThis();
+  const instance = new Brease(breaseConfig);
+  globalObj[INSTANCE_KEY] = {
+    instance,
+    config: breaseConfig
+  };
+  return instance;
 }
 function getInstance() {
-  if (isServer) {
-    if (!serverInstance && globalConfig) {
-      serverInstance = new Brease(globalConfig);
-    }
-    if (!serverInstance) {
-      throw new Error("Brease not initialized on server. Call init(config) first in your root layout with your API token and environment.");
-    }
-    return serverInstance;
-  } else {
-    if (!clientInstance && globalConfig) {
-      clientInstance = new Brease(globalConfig);
-    }
-    if (!clientInstance) {
-      throw new Error("Brease not initialized on client. Call init(config) first in your root layout with your API token and environment.");
-    }
-    return clientInstance;
+  const globalObj = getGlobalThis();
+  const breaseGlobal = globalObj[INSTANCE_KEY];
+  if (!breaseGlobal?.instance) {
+    throw new Error("Brease not initialized. Call init(config) first with your API token and environment.");
   }
+  return breaseGlobal.instance;
 }
 function getPage(pageId) {
   return getInstance().getPage(pageId);

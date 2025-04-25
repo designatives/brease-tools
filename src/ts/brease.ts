@@ -1,11 +1,23 @@
 import { BreaseConfig, Page, BreasePageResponse, Collection, BreaseCollectionResponse, Navigation, BreaseNavigationResponse } from "../types/types"
 
-const isServer = typeof window === 'undefined';
+// Symbol for caching the instance on module exports
+const INSTANCE_KEY = Symbol.for('brease.instance');
 
-// Store the config in a global variable that can be accessed by both server and client
-let globalConfig: BreaseConfig | null = null;
-let serverInstance: Brease | null = null;
-let clientInstance: Brease | null = null;
+interface GlobalWithSymbol {
+  [INSTANCE_KEY]?: {
+    instance: Brease;
+    config: BreaseConfig;
+  };
+}
+
+// This pattern ensures a true singleton across module loads
+const getGlobalThis = (): GlobalWithSymbol => {
+  if (typeof globalThis !== 'undefined') return globalThis as GlobalWithSymbol;
+  if (typeof self !== 'undefined') return self as any as GlobalWithSymbol;
+  if (typeof window !== 'undefined') return window as any as GlobalWithSymbol;
+  if (typeof global !== 'undefined') return global as GlobalWithSymbol;
+  throw new Error('Unable to locate global object');
+};
 
 export class Brease {
   private readonly token: string
@@ -13,11 +25,11 @@ export class Brease {
   private readonly baseEnvironment: string
   private readonly baseProxyUrl: string
 
-  constructor(config: BreaseConfig) {
-    this.token = config.token
-    this.apiUrl = config?.apiUrl || 'https://api.brease.io/v1'
-    this.baseEnvironment = config.environment
-    this.baseProxyUrl = config?.proxyUrl || '/api/brease'
+  constructor(breaseConfig: BreaseConfig) {
+    this.token = breaseConfig.token
+    this.apiUrl = breaseConfig?.apiUrl || 'https://api.brease.io/v1'
+    this.baseEnvironment = breaseConfig.environment
+    this.baseProxyUrl = breaseConfig?.proxyUrl || '/api/brease'
   }
 
   // Server-side: Direct API call with token
@@ -42,6 +54,7 @@ export class Brease {
   }
 
   async getPage(pageId: string): Promise<Page> {
+    const isServer = typeof window === 'undefined';
     if (isServer) {
       const response = (await this.fetchServerData(
         `/environments/${this.baseEnvironment}/pages/${pageId}`
@@ -57,6 +70,7 @@ export class Brease {
   }
 
   async getCollection(collectionId: string): Promise<Collection> {
+    const isServer = typeof window === 'undefined';
     if (isServer) {
       const response = (await this.fetchServerData(
         `/environments/${this.baseEnvironment}/collections/${collectionId}`
@@ -72,6 +86,7 @@ export class Brease {
   }
 
   async getNavigation(navigationId: string): Promise<Navigation> {
+    const isServer = typeof window === 'undefined';
     if (isServer) {
       const response = (await this.fetchServerData(
         `/environments/${this.baseEnvironment}/navigations/${navigationId}`
@@ -90,53 +105,34 @@ export class Brease {
 /**
  * Initialize the Brease client.
  * This only needs to be called once in your app's root layout.
- * The same configuration will be used for both server and client components.
  */
-export function init(config: BreaseConfig): Brease {
-  // Save the config globally
-  globalConfig = config;
+export function init(breaseConfig: BreaseConfig): Brease {
+  const globalObj = getGlobalThis();
   
-  if (isServer) {
-    // Server-side initialization
-    serverInstance = new Brease(config);
-    return serverInstance;
-  } else {
-    // Client-side initialization
-    if (!clientInstance) {
-      clientInstance = new Brease(config);
-    }
-    return clientInstance;
-  }
+  // Create a new instance and store it globally
+  const instance = new Brease(breaseConfig);
+  
+  // Store in a global Symbol registry for better cross-module sharing
+  globalObj[INSTANCE_KEY] = {
+    instance,
+    config: breaseConfig
+  };
+  
+  return instance;
 }
 
 /**
  * Get the Brease instance.
- * Will auto-initialize with the config if previously initialized in the app.
  */
 export function getInstance(): Brease {
-  if (isServer) {
-    // Server-side: Return the server instance or initialize if needed
-    if (!serverInstance && globalConfig) {
-      serverInstance = new Brease(globalConfig);
-    }
-    
-    if (!serverInstance) {
-      throw new Error('Brease not initialized on server. Call init(config) first in your root layout with your API token and environment.');
-    }
-    
-    return serverInstance;
-  } else {
-    // Client-side: Return client instance or initialize if config is available
-    if (!clientInstance && globalConfig) {
-      clientInstance = new Brease(globalConfig);
-    }
-    
-    if (!clientInstance) {
-      throw new Error('Brease not initialized on client. Call init(config) first in your root layout with your API token and environment.');
-    }
-    
-    return clientInstance;
+  const globalObj = getGlobalThis();
+  const breaseGlobal = globalObj[INSTANCE_KEY];
+  
+  if (!breaseGlobal?.instance) {
+    throw new Error('Brease not initialized. Call init(config) first with your API token and environment.');
   }
+  
+  return breaseGlobal.instance;
 }
 
 export function getPage(pageId: string): Promise<Page> {
@@ -150,3 +146,5 @@ export function getCollection(collectionId: string): Promise<Collection> {
 export function getNavigation(navigationId: string): Promise<Navigation> {
   return getInstance().getNavigation(navigationId);
 }
+
+// Removed all HMR handling code to prevent persistence issues
