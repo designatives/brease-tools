@@ -123,12 +123,6 @@ function printSections(page, componentMap) {
   return sections?.map((section, index) => {
     if (section) {
       if (isInIframe) {
-        requestAnimationFrame(() => {
-          const breaseNavigations = window.self.document.getElementsByTagName("nav");
-          Array.from(breaseNavigations).forEach((nav) => {
-            nav.classList.add("brease-preview-hidden");
-          });
-        });
         return import_react2.default.createElement(
           "figure",
           {

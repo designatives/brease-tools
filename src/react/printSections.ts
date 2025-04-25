@@ -11,13 +11,13 @@ export function printSections(page: Page, componentMap: Record<string, React.Com
   return sections?.map((section: any, index: number) => {
     if (section) {
       if (isInIframe) {
-        // Hide navigations
-        requestAnimationFrame(() => {
-          const breaseNavigations = window.self.document.getElementsByTagName('nav');
-          Array.from(breaseNavigations).forEach(nav => {
-            nav.classList.add('brease-preview-hidden');
-          })
-        })
+        //TODO: Hide navigations (next ver)
+        // requestAnimationFrame(() => {
+        //   const breaseNavigations = window.self.document.getElementsByTagName('nav');
+        //   Array.from(breaseNavigations).forEach(nav => {
+        //     nav.classList.add('brease-preview-hidden');
+        //   })
+        // })
         return React.createElement(
           'figure',
           { 
