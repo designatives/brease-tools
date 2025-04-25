@@ -10,21 +10,6 @@ yarn add brease-tools
 pnpm add brease-tools
 ```
 
-## Basic Usage
-
-```typescript
-import { Brease } from "brease-tools";
-// Create a Brease instance
-const brease = new Brease({
-  token: "your_api_token",
-  environment: "production",
-});
-// Fetch data
-const page = await brease.getPage("page-id");
-const collection = await brease.getCollection("collection-id");
-const navigation = await brease.getNavigation("navigation-id");
-```
-
 # Usage
 
 ## 1. NextJS (App Router)

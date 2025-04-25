@@ -1,5 +1,5 @@
 {
-  "name": "@manavian/brease-tools",
+  "name": "@designatives/brease-tools",
   "version": "0.0.4",
   "description": "Brease tools for integrating Brease with your application",
   "main": "dist/index.js",
