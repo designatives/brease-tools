@@ -24,6 +24,9 @@
     "type": "git",
     "url": "git+ssh://git@github.com/designatives/brease-tools.git"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "keywords": [
     "brease"
   ],
