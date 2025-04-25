@@ -89,13 +89,13 @@ declare class Brease {
 }
 /**
  * Initialize the Brease client.
- * Must be called with your API token and environment.
- * If called again with different credentials, it will reinitialize.
+ * This only needs to be called once in your app's root layout.
+ * The same configuration will be used for both server and client components.
  */
 declare function init(config: BreaseConfig): Brease;
 /**
  * Get the Brease instance.
- * Throws an error if not initialized.
+ * Will auto-initialize with the config if previously initialized in the app.
  */
 declare function getInstance(): Brease;
 declare function getPage(pageId: string): Promise<Page>;

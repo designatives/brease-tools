@@ -207,6 +207,9 @@ function insertSectionToolbar(parent, data) {
 
 // src/ts/brease.ts
 var isServer = typeof window === "undefined";
+var globalConfig = null;
+var serverInstance = null;
+var clientInstance = null;
 var Brease = class {
   constructor(config) {
     this.token = config.token;
@@ -276,33 +279,36 @@ var Brease = class {
     }
   }
 };
-var createBreaseStore = () => {
-  let instance = null;
-  let currentConfig = null;
-  return {
-    init: (config) => {
-      const configChanged = !currentConfig || currentConfig.token !== config.token || currentConfig.environment !== config.environment || currentConfig.apiUrl !== config.apiUrl || currentConfig.proxyUrl !== config.proxyUrl;
-      if (!instance || configChanged) {
-        instance = new Brease(config);
-        currentConfig = { ...config };
-      }
-      return instance;
-    },
-    getInstance: () => {
-      return instance;
-    }
-  };
-};
-var breaseStore = createBreaseStore();
 function init(config) {
-  return breaseStore.init(config);
+  globalConfig = config;
+  if (isServer) {
+    serverInstance = new Brease(config);
+    return serverInstance;
+  } else {
+    if (!clientInstance) {
+      clientInstance = new Brease(config);
+    }
+    return clientInstance;
+  }
 }
 function getInstance() {
-  const instance = breaseStore.getInstance();
-  if (!instance) {
-    throw new Error("Brease not initialized. Call init(config) first with your API token and environment.");
+  if (isServer) {
+    if (!serverInstance && globalConfig) {
+      serverInstance = new Brease(globalConfig);
+    }
+    if (!serverInstance) {
+      throw new Error("Brease not initialized on server. Call init(config) first in your root layout with your API token and environment.");
+    }
+    return serverInstance;
+  } else {
+    if (!clientInstance && globalConfig) {
+      clientInstance = new Brease(globalConfig);
+    }
+    if (!clientInstance) {
+      throw new Error("Brease not initialized on client. Call init(config) first in your root layout with your API token and environment.");
+    }
+    return clientInstance;
   }
-  return instance;
 }
 function getPage(pageId) {
   return getInstance().getPage(pageId);

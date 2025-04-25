@@ -2,6 +2,11 @@ import { BreaseConfig, Page, BreasePageResponse, Collection, BreaseCollectionRes
 
 const isServer = typeof window === 'undefined';
 
+// Store the config in a global variable that can be accessed by both server and client
+let globalConfig: BreaseConfig | null = null;
+let serverInstance: Brease | null = null;
+let clientInstance: Brease | null = null;
+
 export class Brease {
   private readonly token: string
   private readonly apiUrl: string
@@ -82,55 +87,56 @@ export class Brease {
   }
 }
 
-const createBreaseStore = () => {
-  let instance: Brease | null = null;
-  let currentConfig: BreaseConfig | null = null;
-  
-  return {
-    init: (config: BreaseConfig): Brease => {
-      // Always create a new instance if config is different
-      const configChanged = !currentConfig || 
-        currentConfig.token !== config.token ||
-        currentConfig.environment !== config.environment ||
-        currentConfig.apiUrl !== config.apiUrl ||
-        currentConfig.proxyUrl !== config.proxyUrl;
-      
-      if (!instance || configChanged) {
-        instance = new Brease(config);
-        currentConfig = { ...config };
-      }
-      
-      return instance;
-    },
-    
-    getInstance: (): Brease | null => {
-      return instance;
-    }
-  };
-};
-
-// Create the store
-const breaseStore = createBreaseStore();
-
 /**
  * Initialize the Brease client.
- * Must be called with your API token and environment.
- * If called again with different credentials, it will reinitialize.
+ * This only needs to be called once in your app's root layout.
+ * The same configuration will be used for both server and client components.
  */
 export function init(config: BreaseConfig): Brease {
-  return breaseStore.init(config);
+  // Save the config globally
+  globalConfig = config;
+  
+  if (isServer) {
+    // Server-side initialization
+    serverInstance = new Brease(config);
+    return serverInstance;
+  } else {
+    // Client-side initialization
+    if (!clientInstance) {
+      clientInstance = new Brease(config);
+    }
+    return clientInstance;
+  }
 }
 
 /**
  * Get the Brease instance.
- * Throws an error if not initialized.
+ * Will auto-initialize with the config if previously initialized in the app.
  */
 export function getInstance(): Brease {
-  const instance = breaseStore.getInstance();
-  if (!instance) {
-    throw new Error('Brease not initialized. Call init(config) first with your API token and environment.');
+  if (isServer) {
+    // Server-side: Return the server instance or initialize if needed
+    if (!serverInstance && globalConfig) {
+      serverInstance = new Brease(globalConfig);
+    }
+    
+    if (!serverInstance) {
+      throw new Error('Brease not initialized on server. Call init(config) first in your root layout with your API token and environment.');
+    }
+    
+    return serverInstance;
+  } else {
+    // Client-side: Return client instance or initialize if config is available
+    if (!clientInstance && globalConfig) {
+      clientInstance = new Brease(globalConfig);
+    }
+    
+    if (!clientInstance) {
+      throw new Error('Brease not initialized on client. Call init(config) first in your root layout with your API token and environment.');
+    }
+    
+    return clientInstance;
   }
-  return instance;
 }
 
 export function getPage(pageId: string): Promise<Page> {
@@ -144,5 +150,3 @@ export function getCollection(collectionId: string): Promise<Collection> {
 export function getNavigation(navigationId: string): Promise<Navigation> {
   return getInstance().getNavigation(navigationId);
 }
-
-// Removed all HMR handling code to prevent persistence issues
