@@ -1,3 +1,4 @@
+import 'styles/index.css'
 import React from 'react';
 
 interface BreaseEditButtonProps {
@@ -41,9 +42,11 @@ export const BreaseEditButton = ({ id }: BreaseEditButtonProps) => {
     return (
         <button
             ref={buttonRef}
-            className={'BreaseEditButton'}
+            className={'brease-edit-button'}
         >
             Edit
         </button>
     );
 };
+
+export default BreaseEditButton;

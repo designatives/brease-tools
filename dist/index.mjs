@@ -1,57 +1,9 @@
-"use strict";
-var __create = Object.create;
-var __defProp = Object.defineProperty;
-var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
-var __getOwnPropNames = Object.getOwnPropertyNames;
-var __getProtoOf = Object.getPrototypeOf;
-var __hasOwnProp = Object.prototype.hasOwnProperty;
-var __export = (target, all) => {
-  for (var name in all)
-    __defProp(target, name, { get: all[name], enumerable: true });
-};
-var __copyProps = (to, from, except, desc) => {
-  if (from && typeof from === "object" || typeof from === "function") {
-    for (let key of __getOwnPropNames(from))
-      if (!__hasOwnProp.call(to, key) && key !== except)
-        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
-  }
-  return to;
-};
-var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
-  // If the importer is in node compatibility mode or this is not an ESM
-  // file that has been converted to a CommonJS file using a Babel-
-  // compatible transform (i.e. "__esModule" has not been set), then set
-  // "default" to the CommonJS "module.exports" for node compatibility.
-  isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
-  mod
-));
-var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
-
-// src/index.ts
-var index_exports = {};
-__export(index_exports, {
-  Brease: () => Brease,
-  BreaseEditButton: () => BreaseEditButton,
-  SectionToolbar: () => SectionToolbar,
-  createBreaseEditButton: () => createBreaseEditButton,
-  createSectionToolbar: () => createSectionToolbar,
-  getCollection: () => getCollection,
-  getInstance: () => getInstance,
-  getNavigation: () => getNavigation,
-  getPage: () => getPage,
-  init: () => init,
-  insertBreaseEditButton: () => insertBreaseEditButton,
-  insertSectionToolbar: () => insertSectionToolbar,
-  printSections: () => printSections
-});
-module.exports = __toCommonJS(index_exports);
-
 // src/react/printSections.ts
-var import_react2 = __toESM(require("react"));
+import React2 from "react";
 
 // src/react/ui/SectionToolbar/SectionEditButton/index.tsx
-var import_react = __toESM(require("react"));
-var import_jsx_runtime = require("react/jsx-runtime");
+import React from "react";
+import { jsx } from "react/jsx-runtime";
 function BreaseAction(action, data) {
   if (typeof window !== "undefined" && window.parent) {
     window.parent.postMessage(
@@ -67,8 +19,8 @@ function BreaseAction(action, data) {
   }
 }
 var BreaseEditButton = ({ id }) => {
-  const buttonRef = import_react.default.useRef(null);
-  import_react.default.useEffect(() => {
+  const buttonRef = React.useRef(null);
+  React.useEffect(() => {
     const handleClick = () => {
       BreaseAction("BreaseEditSection", { uuid: id });
     };
@@ -82,7 +34,7 @@ var BreaseEditButton = ({ id }) => {
       }
     };
   }, [id]);
-  return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
+  return /* @__PURE__ */ jsx(
     "button",
     {
       ref: buttonRef,
@@ -93,11 +45,11 @@ var BreaseEditButton = ({ id }) => {
 };
 
 // src/react/ui/SectionToolbar/index.tsx
-var import_jsx_runtime2 = require("react/jsx-runtime");
+import { jsx as jsx2, jsxs } from "react/jsx-runtime";
 function SectionToolbar({ data }) {
-  return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "brease-section-toolbar", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "brease-section-title", children: data.name }) }),
-    /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "brease-toolbar-actions", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(BreaseEditButton, { id: data.uuid }) })
+  return /* @__PURE__ */ jsxs("div", { className: "brease-section-toolbar", children: [
+    /* @__PURE__ */ jsx2("div", { children: /* @__PURE__ */ jsx2("span", { className: "brease-section-title", children: data.name }) }),
+    /* @__PURE__ */ jsx2("div", { className: "brease-toolbar-actions", children: /* @__PURE__ */ jsx2(BreaseEditButton, { id: data.uuid }) })
   ] });
 }
 
@@ -123,29 +75,29 @@ function printSections(page, componentMap) {
   return sections?.map((section, index) => {
     if (section) {
       if (isInIframe) {
-        return import_react2.default.createElement(
+        return React2.createElement(
           "figure",
           {
             key: index,
             id: section.uuid,
             className: "brease-section"
           },
-          import_react2.default.createElement(SectionToolbar, { data: section }),
+          React2.createElement(SectionToolbar, { data: section }),
           // Add overlays to disable interactivity
-          import_react2.default.createElement("div", {
+          React2.createElement("div", {
             className: "brease-preview-overlay"
           }),
-          import_react2.default.createElement(section.component, { data: section.data })
+          React2.createElement(section.component, { data: section.data })
         );
       } else {
-        return import_react2.default.createElement(
+        return React2.createElement(
           "figure",
           {
             key: index,
             id: section.uuid,
             className: "brease-section"
           },
-          import_react2.default.createElement(section.component, { data: section.data })
+          React2.createElement(section.component, { data: section.data })
         );
       }
     }
@@ -313,3 +265,18 @@ function getCollection(collectionId) {
 function getNavigation(navigationId) {
   return getInstance().getNavigation(navigationId);
 }
+export {
+  Brease,
+  BreaseEditButton,
+  SectionToolbar,
+  createBreaseEditButton,
+  createSectionToolbar,
+  getCollection,
+  getInstance,
+  getNavigation,
+  getPage,
+  init,
+  insertBreaseEditButton,
+  insertSectionToolbar,
+  printSections
+};

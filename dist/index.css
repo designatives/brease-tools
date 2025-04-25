@@ -1,1 +1,86 @@
-header{display:none}figure{max-height:unset;overflow:unset}figure.index_BreaseSectionHide__RHSP5{max-height:48px;overflow:hidden}.index_BreaseSectionToolbar__5cQW8{align-items:center;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);background-color:rgba(245,246,248,.6);border-bottom:1px solid #e2e4ea;box-sizing:border-box;display:flex;height:46px;justify-content:space-between;padding:8px 16px;position:sticky;top:0;z-index:1000}.index_BreaseSectionToolbar__5cQW8 .index_BreaseSectionTitle__xoAmK{color:#282b32;font-weight:500}.index_BreaseSectionToolbar__5cQW8 .index_BreaseToolbarActions__BewIF{align-items:center;display:flex;gap:12px}.index_BreaseSectionToolbar__5cQW8 .index_BreaseEditButton__mqUEm{align-items:center;background-color:#07080a;border:none;border-radius:44px;color:#fff;cursor:pointer;display:flex;font-size:12px;font-weight:500;height:30px;padding:0 10px}.index_BreaseSectionToolbar__5cQW8 .index_BreaseToggleSectionButton__aKJsN{align-items:center;background-color:#fff;border:1px solid #e2e4ea;border-radius:50%;cursor:pointer;display:flex;height:30px;justify-content:center;width:30px}.index_BreaseSectionToolbar__5cQW8 .index_BreaseToggleSectionButton__aKJsN svg{pointer-events:none;transform:rotate(180deg);transition:transform .3s ease-in-out}.index_BreaseSectionToolbar__5cQW8 .index_BreaseToggleSectionButton__aKJsN[data-open=false] svg{transform:rotate(0deg)}.index_BreaseSectionToolbar__5cQW8+section{opacity:1;transition:opacity .5s ease-in-out,margin .5s ease-in-out}.index_BreaseSectionToolbar__5cQW8:hover+section{opacity:.6}
+/* src/styles/index.css */
+.brease-preview-hidden {
+  display: none;
+}
+.brease-section {
+  position: relative;
+  max-height: unset;
+  overflow: unset;
+}
+.brease-preview-overlay {
+  position: absolute;
+  height: 100%;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: transparent;
+  z-index: 9999;
+}
+.brease-section-hide {
+  max-height: 48px;
+  overflow: hidden;
+}
+.brease-section-toolbar {
+  background-color: rgba(245, 246, 248, 0.6);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid #E2E4EA;
+  height: 46px;
+  padding: 8px 16px;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+  position: sticky;
+  top: 0;
+}
+.brease-section-toolbar .brease-section-title {
+  font-weight: 500;
+  color: #282B32;
+}
+.brease-section-toolbar .brease-toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.brease-section-toolbar .brease-edit-button {
+  background-color: #07080A;
+  border: none;
+  border-radius: 44px;
+  padding: 0 10px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #FFFFFF;
+  cursor: pointer;
+  height: 30px;
+  align-items: center;
+  display: flex;
+}
+.brease-section-toolbar .brease-toggle-section-button {
+  background-color: #FFFFFF;
+  border: 1px solid #E2E4EA;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+}
+.brease-section-toolbar .brease-toggle-section-button svg {
+  transform: rotate(180deg);
+  transition: 300ms transform ease-in-out;
+  pointer-events: none;
+}
+.brease-section-toolbar .brease-toggle-section-button[data-open=false] svg {
+  transform: rotate(0deg);
+}
+.brease-section-toolbar + section {
+  opacity: 1;
+  transition: 500ms opacity ease-in-out, 500ms margin ease-in-out;
+}
+.brease-section-toolbar:hover + section {
+  opacity: 0.6;
+}

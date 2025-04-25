@@ -1,11 +1,11 @@
 {
   "compilerOptions": {
-    "outDir": "dist",
+    "outDir": "./dist",
     "declaration": true,
     "declarationMap": true,
     "skipLibCheck": true,
-    "declarationDir": "dist/types",
-    "emitDeclarationOnly": true,
+    "declarationDir": "./dist",
+    "emitDeclarationOnly": false,
     "module": "ESNext",
     "moduleResolution": "node",
     "target": "ES6",
@@ -19,6 +19,6 @@
     "typeRoots": ["./node_modules/@types", "./declarations.d.ts"],
     "lib": ["DOM", "ESNext"]
   },
-  "include": ["./declarations.d.ts","./src/**/*"],
-  "exclude": ["node_modules", "dist","src/index-with-styles.ts"]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
 }
