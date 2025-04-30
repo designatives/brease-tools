@@ -17,7 +17,7 @@
     right: 0;
     bottom: 0;
     background-color: transparent;
-    z-index: 9999;
+    z-index: 9998;
 }
 
 .brease-section-hide {
@@ -40,6 +40,7 @@
     box-sizing: border-box;
     position: sticky;
     top: 0;
+    z-index: 9999;
 }
 
 .brease-section-toolbar .brease-section-title {
