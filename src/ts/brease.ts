@@ -36,6 +36,7 @@ export class Brease {
   private async fetchServerData(url: string): Promise<any> {
     const response = await fetch(this.apiUrl + url, {
       method: 'GET',
+      cache: 'no-store',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${this.token}`

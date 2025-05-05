@@ -177,6 +177,7 @@ var Brease = class {
   async fetchServerData(url) {
     const response = await fetch(this.apiUrl + url, {
       method: "GET",
+      cache: "no-store",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${this.token}`
