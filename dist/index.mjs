@@ -186,56 +186,67 @@ var Brease = class {
     return await response.json();
   }
   // Client-side: Call the proxy endpoint
-  async fetchClientData(endpoint, id) {
-    const response = await fetch(`${this.baseProxyUrl}/${endpoint}?id=${encodeURIComponent(id)}`);
+  async fetchClientData(endpoint) {
+    const response = await fetch(`${this.baseProxyUrl}/${endpoint}}`);
     if (!response.ok) {
       throw new Error(`Failed to fetch ${endpoint}: ${response.statusText}`);
     }
     return await response.json();
   }
-  async getPage(pageId) {
+  async getPageByID(pageId) {
     const isServer = typeof window === "undefined";
+    const endpoint = `/environments/${this.baseEnvironment}/pages/${pageId}`;
     if (isServer) {
-      const response = await this.fetchServerData(
-        `/environments/${this.baseEnvironment}/pages/${pageId}`
-      );
+      const response = await this.fetchServerData(endpoint);
       if (response.message) {
         throw new Error(response.message);
       } else {
         return response.data.page;
       }
     } else {
-      return await this.fetchClientData("page", pageId);
+      return await this.fetchClientData(endpoint);
+    }
+  }
+  async getPageBySlug(pageSlug, locale) {
+    const isServer = typeof window === "undefined";
+    const endpoint = `/environments/${this.baseEnvironment}/page?locale=${locale || "en"}&slug=${pageSlug}`;
+    if (isServer) {
+      const response = await this.fetchServerData(endpoint);
+      if (response.message) {
+        throw new Error(response.message);
+      } else {
+        return response.data.page;
+      }
+    } else {
+      return await this.fetchClientData(endpoint);
     }
   }
   async getCollection(collectionId) {
     const isServer = typeof window === "undefined";
+    const endpoint = `/environments/${this.baseEnvironment}/collections/${collectionId}`;
     if (isServer) {
-      const response = await this.fetchServerData(
-        `/environments/${this.baseEnvironment}/collections/${collectionId}`
-      );
+      const response = await this.fetchServerData(endpoint);
       if (response.message) {
         throw new Error(response.message);
       } else {
         return response.data.collection;
       }
     } else {
-      return await this.fetchClientData("collection", collectionId);
+      return await this.fetchClientData(endpoint);
     }
   }
   async getNavigation(navigationId) {
     const isServer = typeof window === "undefined";
+    const endpoint = `/environments/${this.baseEnvironment}/navigations/${navigationId}`;
     if (isServer) {
-      const response = await this.fetchServerData(
-        `/environments/${this.baseEnvironment}/navigations/${navigationId}`
-      );
+      const response = await this.fetchServerData(endpoint);
       if (response.message) {
         throw new Error(response.message);
       } else {
         return response.data.navigation;
       }
     } else {
-      return await this.fetchClientData("navigation", navigationId);
+      return await this.fetchClientData(endpoint);
     }
   }
 };
@@ -256,8 +267,11 @@ function getInstance() {
   }
   return breaseGlobal.instance;
 }
-function getPage(pageId) {
-  return getInstance().getPage(pageId);
+function getPageByID(pageId) {
+  return getInstance().getPageByID(pageId);
+}
+function getPageBySlug(pageSlug, locale) {
+  return getInstance().getPageBySlug(pageSlug, locale);
 }
 function getCollection(collectionId) {
   return getInstance().getCollection(collectionId);
@@ -274,7 +288,8 @@ export {
   getCollection,
   getInstance,
   getNavigation,
-  getPage,
+  getPageByID,
+  getPageBySlug,
   init,
   insertBreaseEditButton,
   insertSectionToolbar,

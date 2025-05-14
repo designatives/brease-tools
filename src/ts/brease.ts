@@ -46,59 +46,71 @@ export class Brease {
   }
 
   // Client-side: Call the proxy endpoint
-  private async fetchClientData(endpoint: string, id: string): Promise<any> {
-    const response = await fetch(`${this.baseProxyUrl}/${endpoint}?id=${encodeURIComponent(id)}`)
+  private async fetchClientData(endpoint: string): Promise<any> {
+    const response = await fetch(`${this.baseProxyUrl}/${endpoint}}`)
     if (!response.ok) {
       throw new Error(`Failed to fetch ${endpoint}: ${response.statusText}`)
     }
     return await response.json()
   }
 
-  async getPage(pageId: string): Promise<Page> {
+  async getPageByID(pageId: string): Promise<Page> {
     const isServer = typeof window === 'undefined';
+    const endpoint = `/environments/${this.baseEnvironment}/pages/${pageId}`
     if (isServer) {
-      const response = (await this.fetchServerData(
-        `/environments/${this.baseEnvironment}/pages/${pageId}`
-      )) as BreasePageResponse
+      const response = (await this.fetchServerData(endpoint)) as BreasePageResponse
       if(response.message){
         throw new Error(response.message)
       } else {
         return response.data.page
       }
     } else {
-      return await this.fetchClientData('page', pageId)
+      return await this.fetchClientData(endpoint)
+    }
+  }
+
+  async getPageBySlug(pageSlug: string, locale?: string): Promise<Page> {
+    const isServer = typeof window === 'undefined';
+    const endpoint = `/environments/${this.baseEnvironment}/page?locale=${locale||'en'}&slug=${pageSlug}`
+    if (isServer) {
+      const response = (await this.fetchServerData(endpoint)) as BreasePageResponse
+      if(response.message){
+        throw new Error(response.message)
+      } else {
+        return response.data.page
+      }
+    } else {
+      return await this.fetchClientData(endpoint)
     }
   }
 
   async getCollection(collectionId: string): Promise<Collection> {
     const isServer = typeof window === 'undefined';
+    const endpoint = `/environments/${this.baseEnvironment}/collections/${collectionId}`
     if (isServer) {
-      const response = (await this.fetchServerData(
-        `/environments/${this.baseEnvironment}/collections/${collectionId}`
-      )) as BreaseCollectionResponse
+      const response = (await this.fetchServerData(endpoint)) as BreaseCollectionResponse
       if(response.message){
         throw new Error(response.message)
       } else {
         return response.data.collection
       }
     } else {
-      return await this.fetchClientData('collection', collectionId)
+      return await this.fetchClientData(endpoint)
     }
   }
 
   async getNavigation(navigationId: string): Promise<Navigation> {
     const isServer = typeof window === 'undefined';
+    const endpoint = `/environments/${this.baseEnvironment}/navigations/${navigationId}`
     if (isServer) {
-      const response = (await this.fetchServerData(
-        `/environments/${this.baseEnvironment}/navigations/${navigationId}`
-      )) as BreaseNavigationResponse
+      const response = (await this.fetchServerData(endpoint)) as BreaseNavigationResponse
       if(response.message){
         throw new Error(response.message)
       } else {
         return response.data.navigation
       }
     } else {
-      return await this.fetchClientData('navigation', navigationId)
+      return await this.fetchClientData(endpoint)
     }
   }
 }
@@ -136,8 +148,12 @@ export function getInstance(): Brease {
   return breaseGlobal.instance;
 }
 
-export function getPage(pageId: string): Promise<Page> {
-  return getInstance().getPage(pageId);
+export function getPageByID(pageId: string): Promise<Page> {
+  return getInstance().getPageByID(pageId);
+}
+
+export function getPageBySlug(pageSlug: string, locale?: string): Promise<Page> {
+  return getInstance().getPageBySlug(pageSlug, locale);
 }
 
 export function getCollection(collectionId: string): Promise<Collection> {
@@ -147,5 +163,3 @@ export function getCollection(collectionId: string): Promise<Collection> {
 export function getNavigation(navigationId: string): Promise<Navigation> {
   return getInstance().getNavigation(navigationId);
 }
-
-// Removed all HMR handling code to prevent persistence issues

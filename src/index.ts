@@ -8,7 +8,8 @@ export {
   Brease, 
   init,
   getInstance, 
-  getPage, 
+  getPageByID,
+  getPageBySlug, 
   getCollection, 
   getNavigation 
 } from './ts/brease';

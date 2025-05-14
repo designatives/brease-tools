@@ -83,7 +83,8 @@ declare class Brease {
     constructor(breaseConfig: BreaseConfig);
     private fetchServerData;
     private fetchClientData;
-    getPage(pageId: string): Promise<Page>;
+    getPageByID(pageId: string): Promise<Page>;
+    getPageBySlug(pageSlug: string, locale?: string): Promise<Page>;
     getCollection(collectionId: string): Promise<Collection>;
     getNavigation(navigationId: string): Promise<Navigation>;
 }
@@ -96,8 +97,9 @@ declare function init(breaseConfig: BreaseConfig): Brease;
  * Get the Brease instance.
  */
 declare function getInstance(): Brease;
-declare function getPage(pageId: string): Promise<Page>;
+declare function getPageByID(pageId: string): Promise<Page>;
+declare function getPageBySlug(pageSlug: string, locale?: string): Promise<Page>;
 declare function getCollection(collectionId: string): Promise<Collection>;
 declare function getNavigation(navigationId: string): Promise<Navigation>;
 
-export { Brease, type BreaseCollectionResponse, type BreaseConfig, BreaseEditButton, type BreaseNavigationResponse, type BreasePageResponse, type Collection, type Navigation, type Page, type PageSection, SectionToolbar, type SectionToolbarData, createBreaseEditButton, createSectionToolbar, getCollection, getInstance, getNavigation, getPage, init, insertBreaseEditButton, insertSectionToolbar, printSections };
+export { Brease, type BreaseCollectionResponse, type BreaseConfig, BreaseEditButton, type BreaseNavigationResponse, type BreasePageResponse, type Collection, type Navigation, type Page, type PageSection, SectionToolbar, type SectionToolbarData, createBreaseEditButton, createSectionToolbar, getCollection, getInstance, getNavigation, getPageByID, getPageBySlug, init, insertBreaseEditButton, insertSectionToolbar, printSections };
