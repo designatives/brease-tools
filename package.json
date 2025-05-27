@@ -39,6 +39,8 @@
   "devDependencies": {
     "@types/node": "^22.13.10",
     "@types/react": "^19.0.12",
+    "@vue/runtime-core": "^3.4.15",
+    "svelte": "^4.2.10",
     "tslib": "^2.8.1",
     "tsup": "^8.4.0",
     "typescript": "^5.8.2"
@@ -49,6 +51,22 @@
   },
   "peerDependencies": {
     "react": "^18.3.1",
-    "react-dom": "^18.0.0"
+    "react-dom": "^18.0.0",
+    "svelte": "^4.0.0",
+    "vue": "^3.0.0"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    },
+    "react-dom": {
+      "optional": true
+    },
+    "svelte": {
+      "optional": true
+    },
+    "vue": {
+      "optional": true
+    }
   }
 }
