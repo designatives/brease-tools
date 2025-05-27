@@ -158,20 +158,22 @@ function insertSectionToolbar(parent, data) {
 }
 
 // src/ts/brease.ts
-var INSTANCE_KEY = Symbol.for("brease.instance");
-var getGlobalThis = () => {
-  if (typeof globalThis !== "undefined") return globalThis;
-  if (typeof self !== "undefined") return self;
-  if (typeof window !== "undefined") return window;
-  if (typeof global !== "undefined") return global;
-  throw new Error("Unable to locate global object");
+var initializationState = {
+  status: "uninitialized"
 };
-var Brease = class {
+var Brease = class _Brease {
   constructor(breaseConfig) {
     this.token = breaseConfig.token;
     this.apiUrl = breaseConfig?.apiUrl || "https://api.brease.io/v1";
     this.baseEnvironment = breaseConfig.environment;
     this.baseProxyUrl = breaseConfig?.proxyUrl || "/api/brease";
+  }
+  /**
+   * Create a new Brease instance.
+   * This is used by framework-specific implementations.
+   */
+  static createInstance(config) {
+    return new _Brease(config);
   }
   // Server-side: Direct API call with token
   async fetchServerData(url) {
@@ -183,11 +185,14 @@ var Brease = class {
         Authorization: `Bearer ${this.token}`
       }
     });
+    if (!response.ok) {
+      throw new Error(`API request failed: ${response.statusText}`);
+    }
     return await response.json();
   }
   // Client-side: Call the proxy endpoint
   async fetchClientData(endpoint) {
-    const response = await fetch(`${this.baseProxyUrl}/${endpoint}}`);
+    const response = await fetch(`${this.baseProxyUrl}/${endpoint}`);
     if (!response.ok) {
       throw new Error(`Failed to fetch ${endpoint}: ${response.statusText}`);
     }
@@ -196,76 +201,111 @@ var Brease = class {
   async getPageByID(pageId) {
     const isServer = typeof window === "undefined";
     const endpoint = `/environments/${this.baseEnvironment}/pages/${pageId}`;
-    if (isServer) {
-      const response = await this.fetchServerData(endpoint);
-      if (response.message) {
-        throw new Error(response.message);
-      } else {
+    try {
+      if (isServer) {
+        const response = await this.fetchServerData(endpoint);
+        if (response.message) {
+          throw new Error(response.message);
+        }
         return response.data.page;
+      } else {
+        return await this.fetchClientData(endpoint);
       }
-    } else {
-      return await this.fetchClientData(endpoint);
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new Error(`Failed to fetch page by ID: ${error.message}`);
+      }
+      throw new Error("Failed to fetch page by ID: Unknown error");
     }
   }
   async getPageBySlug(pageSlug, locale) {
     const isServer = typeof window === "undefined";
     const endpoint = `/environments/${this.baseEnvironment}/page?locale=${locale || "en"}&slug=${pageSlug}`;
-    if (isServer) {
-      const response = await this.fetchServerData(endpoint);
-      if (response.message) {
-        throw new Error(response.message);
-      } else {
+    try {
+      if (isServer) {
+        const response = await this.fetchServerData(endpoint);
+        if (response.message) {
+          throw new Error(response.message);
+        }
         return response.data.page;
+      } else {
+        return await this.fetchClientData(endpoint);
       }
-    } else {
-      return await this.fetchClientData(endpoint);
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new Error(`Failed to fetch page by slug: ${error.message}`);
+      }
+      throw new Error("Failed to fetch page by slug: Unknown error");
     }
   }
   async getCollection(collectionId) {
     const isServer = typeof window === "undefined";
     const endpoint = `/environments/${this.baseEnvironment}/collections/${collectionId}`;
-    if (isServer) {
-      const response = await this.fetchServerData(endpoint);
-      if (response.message) {
-        throw new Error(response.message);
-      } else {
+    try {
+      if (isServer) {
+        const response = await this.fetchServerData(endpoint);
+        if (response.message) {
+          throw new Error(response.message);
+        }
         return response.data.collection;
+      } else {
+        return await this.fetchClientData(endpoint);
       }
-    } else {
-      return await this.fetchClientData(endpoint);
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new Error(`Failed to fetch collection: ${error.message}`);
+      }
+      throw new Error("Failed to fetch collection: Unknown error");
     }
   }
   async getNavigation(navigationId) {
     const isServer = typeof window === "undefined";
     const endpoint = `/environments/${this.baseEnvironment}/navigations/${navigationId}`;
-    if (isServer) {
-      const response = await this.fetchServerData(endpoint);
-      if (response.message) {
-        throw new Error(response.message);
-      } else {
+    try {
+      if (isServer) {
+        const response = await this.fetchServerData(endpoint);
+        if (response.message) {
+          throw new Error(response.message);
+        }
         return response.data.navigation;
+      } else {
+        return await this.fetchClientData(endpoint);
       }
-    } else {
-      return await this.fetchClientData(endpoint);
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new Error(`Failed to fetch navigation: ${error.message}`);
+      }
+      throw new Error("Failed to fetch navigation: Unknown error");
     }
   }
 };
-function init(breaseConfig) {
-  const globalObj = getGlobalThis();
-  const instance = new Brease(breaseConfig);
-  globalObj[INSTANCE_KEY] = {
-    instance,
-    config: breaseConfig
-  };
-  return instance;
+async function init(breaseConfig) {
+  if (initializationState.status === "initialized") {
+    return;
+  }
+  if (initializationState.status === "initializing") {
+    throw new Error("Brease is already initializing");
+  }
+  try {
+    initializationState = { status: "initializing" };
+    const instance = Brease.createInstance(breaseConfig);
+    initializationState = {
+      status: "initialized",
+      instance
+    };
+  } catch (error) {
+    initializationState = {
+      status: "error",
+      error: error instanceof Error ? error : new Error(String(error))
+    };
+    throw error;
+  }
 }
 function getInstance() {
-  const globalObj = getGlobalThis();
-  const breaseGlobal = globalObj[INSTANCE_KEY];
-  if (!breaseGlobal?.instance) {
-    throw new Error("Brease not initialized. Call init(config) first with your API token and environment.");
+  if (initializationState.status !== "initialized" || !initializationState.instance) {
+    throw new Error(`Brease is not initialized (current status: ${initializationState.status}). Call init(config) first with your API token and environment.`);
   }
-  return breaseGlobal.instance;
+  return initializationState.instance;
 }
 function getPageByID(pageId) {
   return getInstance().getPageByID(pageId);

@@ -80,7 +80,12 @@ declare class Brease {
     private readonly apiUrl;
     private readonly baseEnvironment;
     private readonly baseProxyUrl;
-    constructor(breaseConfig: BreaseConfig);
+    protected constructor(breaseConfig: BreaseConfig);
+    /**
+     * Create a new Brease instance.
+     * This is used by framework-specific implementations.
+     */
+    static createInstance(config: BreaseConfig): Brease;
     private fetchServerData;
     private fetchClientData;
     getPageByID(pageId: string): Promise<Page>;
@@ -90,11 +95,12 @@ declare class Brease {
 }
 /**
  * Initialize the Brease client.
- * This only needs to be called once in your app's root layout.
+ * Returns a promise that resolves when initialization is complete.
  */
-declare function init(breaseConfig: BreaseConfig): Brease;
+declare function init(breaseConfig: BreaseConfig): Promise<void>;
 /**
  * Get the Brease instance.
+ * Throws if not initialized.
  */
 declare function getInstance(): Brease;
 declare function getPageByID(pageId: string): Promise<Page>;
