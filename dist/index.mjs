@@ -267,7 +267,7 @@ var Brease = class _Brease {
         if (response.message) {
           throw new Error(response.message);
         }
-        return response.data.collection;
+        return response.data.entry;
       } else {
         return await this.fetchClientData(endpoint);
       }

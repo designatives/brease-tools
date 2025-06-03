@@ -25,12 +25,20 @@ export interface PageSection {
 }
 
 export interface Collection {
+  uuid: string
   name: string
   entries: any[]
 }
 
 export interface Navigation {
   items: any[]
+}
+
+export interface Entry {
+  uuid: string
+  name: string
+  slug: string
+  elements: any[]
 }
 
 export interface BreasePageResponse extends Response {
@@ -43,6 +51,13 @@ export interface BreasePageResponse extends Response {
 export interface BreaseCollectionResponse extends Response {
   data: {
     collection: Collection
+  }
+  message: string | null
+}
+
+export interface BreaseEntryResponse extends Response {
+  data: {
+    entry: Entry
   }
   message: string | null
 }

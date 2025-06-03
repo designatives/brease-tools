@@ -25,11 +25,18 @@ interface PageSection {
     elements: [];
 }
 interface Collection {
+    uuid: string;
     name: string;
     entries: any[];
 }
 interface Navigation {
     items: any[];
+}
+interface Entry {
+    uuid: string;
+    name: string;
+    slug: string;
+    elements: any[];
 }
 interface BreasePageResponse extends Response {
     data: {
@@ -96,7 +103,7 @@ declare class Brease {
     getPageByID(pageId: string): Promise<Page>;
     getPageBySlug(pageSlug: string, locale?: string): Promise<Page>;
     getCollection(collectionId: string): Promise<Collection>;
-    getEntryBySlug(collectionId: string, entrySlug: string, locale?: string): Promise<Collection>;
+    getEntryBySlug(collectionId: string, entrySlug: string, locale?: string): Promise<Entry>;
     getNavigation(navigationId: string): Promise<Navigation>;
 }
 /**
@@ -116,7 +123,7 @@ declare function getInstance(): Brease;
 declare function getPageByID(pageId: string): Promise<Page>;
 declare function getPageBySlug(pageSlug: string, locale?: string): Promise<Page>;
 declare function getCollection(collectionId: string): Promise<Collection>;
-declare function getEntryBySlug(collectionId: string, entrySlug: string, locale?: string): Promise<Collection>;
+declare function getEntryBySlug(collectionId: string, entrySlug: string, locale?: string): Promise<Entry>;
 declare function getNavigation(navigationId: string): Promise<Navigation>;
 
 export { Brease, type BreaseCollectionResponse, type BreaseConfig, BreaseEditButton, type BreaseNavigationResponse, type BreasePageResponse, type Collection, type Navigation, type Page, type PageSection, SectionToolbar, type SectionToolbarData, createBreaseEditButton, createSectionToolbar, getCollection, getEntryBySlug, getInitializationState, getInstance, getNavigation, getPageByID, getPageBySlug, init, insertBreaseEditButton, insertSectionToolbar, printSections };

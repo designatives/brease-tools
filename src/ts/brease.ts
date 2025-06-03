@@ -1,4 +1,4 @@
-import { BreaseConfig, Page, BreasePageResponse, Collection, BreaseCollectionResponse, Navigation, BreaseNavigationResponse } from "../types/types"
+import { BreaseConfig, Page, BreasePageResponse, Collection, BreaseCollectionResponse, Navigation, BreaseNavigationResponse, BreaseEntryResponse, Entry } from "../types/types"
 
 type InitializationState = {
   status: 'uninitialized' | 'initializing' | 'initialized' | 'error';
@@ -125,17 +125,17 @@ export class Brease {
     }
   }
 
-  async getEntryBySlug(collectionId: string, entrySlug:string, locale?: string): Promise<Collection> {
+  async getEntryBySlug(collectionId: string, entrySlug:string, locale?: string): Promise<Entry> {
     const isServer = typeof window === 'undefined';
     const endpoint = `/environments/${this.baseEnvironment}/collections/${collectionId}/entry?locale=${locale || 'en'}&slug=${entrySlug}`;
     
     try {
       if (isServer) {
-        const response = (await this.fetchServerData(endpoint)) as BreaseCollectionResponse;
+        const response = (await this.fetchServerData(endpoint)) as BreaseEntryResponse;
         if (response.message) {
           throw new Error(response.message);
         }
-        return response.data.collection;
+        return response.data.entry;
       } else {
         return await this.fetchClientData(endpoint);
       }
@@ -236,7 +236,7 @@ export function getCollection(collectionId: string): Promise<Collection> {
   return getInstance().getCollection(collectionId);
 }
 
-export function getEntryBySlug(collectionId: string, entrySlug: string, locale?: string): Promise<Collection> {
+export function getEntryBySlug(collectionId: string, entrySlug: string, locale?: string): Promise<Entry> {
   return getInstance().getEntryBySlug(collectionId, entrySlug, locale);
 }
 
