@@ -5,12 +5,14 @@ export { BreaseEditButton } from './react/ui/SectionToolbar/SectionEditButton';
 export { createSectionToolbar, insertSectionToolbar } from './ts/ui/SectionToolbar';
 export { createBreaseEditButton, insertBreaseEditButton } from './ts/ui/SectionToolbar/SectionEditButton';
 export { 
-  Brease, 
+  Brease,
+  getInitializationState, 
   init,
   getInstance, 
   getPageByID,
   getPageBySlug, 
   getCollection, 
+  getEntryBySlug,
   getNavigation 
 } from './ts/brease';
 export type { 

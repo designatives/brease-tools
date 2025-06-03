@@ -125,6 +125,28 @@ export class Brease {
     }
   }
 
+  async getEntryBySlug(collectionId: string, entrySlug:string, locale?: string): Promise<Collection> {
+    const isServer = typeof window === 'undefined';
+    const endpoint = `/environments/${this.baseEnvironment}/collections/${collectionId}/entry?locale=${locale || 'en'}&slug=${entrySlug}`;
+    
+    try {
+      if (isServer) {
+        const response = (await this.fetchServerData(endpoint)) as BreaseCollectionResponse;
+        if (response.message) {
+          throw new Error(response.message);
+        }
+        return response.data.collection;
+      } else {
+        return await this.fetchClientData(endpoint);
+      }
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        throw new Error(`Failed to fetch collection: ${error.message}`);
+      }
+      throw new Error('Failed to fetch collection: Unknown error');
+    }
+  }
+
   async getNavigation(navigationId: string): Promise<Navigation> {
     const isServer = typeof window === 'undefined';
     const endpoint = `/environments/${this.baseEnvironment}/navigations/${navigationId}`;
@@ -212,6 +234,10 @@ export function getPageBySlug(pageSlug: string, locale?: string): Promise<Page> 
 
 export function getCollection(collectionId: string): Promise<Collection> {
   return getInstance().getCollection(collectionId);
+}
+
+export function getEntryBySlug(collectionId: string, entrySlug: string, locale?: string): Promise<Collection> {
+  return getInstance().getEntryBySlug(collectionId, entrySlug, locale);
 }
 
 export function getNavigation(navigationId: string): Promise<Navigation> {

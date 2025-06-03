@@ -75,6 +75,11 @@ interface BreaseEditButtonProps {
 declare function createBreaseEditButton({ id }: BreaseEditButtonProps): HTMLButtonElement;
 declare function insertBreaseEditButton(container: HTMLElement, id: string): HTMLButtonElement;
 
+type InitializationState = {
+    status: 'uninitialized' | 'initializing' | 'initialized' | 'error';
+    error?: Error;
+    instance?: Brease;
+};
 declare class Brease {
     private readonly token;
     private readonly apiUrl;
@@ -91,6 +96,7 @@ declare class Brease {
     getPageByID(pageId: string): Promise<Page>;
     getPageBySlug(pageSlug: string, locale?: string): Promise<Page>;
     getCollection(collectionId: string): Promise<Collection>;
+    getEntryBySlug(collectionId: string, entrySlug: string, locale?: string): Promise<Collection>;
     getNavigation(navigationId: string): Promise<Navigation>;
 }
 /**
@@ -99,6 +105,10 @@ declare class Brease {
  */
 declare function init(breaseConfig: BreaseConfig): Promise<void>;
 /**
+ * Get the initialization status of Brease
+ */
+declare function getInitializationState(): InitializationState;
+/**
  * Get the Brease instance.
  * Throws if not initialized.
  */
@@ -106,6 +116,7 @@ declare function getInstance(): Brease;
 declare function getPageByID(pageId: string): Promise<Page>;
 declare function getPageBySlug(pageSlug: string, locale?: string): Promise<Page>;
 declare function getCollection(collectionId: string): Promise<Collection>;
+declare function getEntryBySlug(collectionId: string, entrySlug: string, locale?: string): Promise<Collection>;
 declare function getNavigation(navigationId: string): Promise<Navigation>;
 
-export { Brease, type BreaseCollectionResponse, type BreaseConfig, BreaseEditButton, type BreaseNavigationResponse, type BreasePageResponse, type Collection, type Navigation, type Page, type PageSection, SectionToolbar, type SectionToolbarData, createBreaseEditButton, createSectionToolbar, getCollection, getInstance, getNavigation, getPageByID, getPageBySlug, init, insertBreaseEditButton, insertSectionToolbar, printSections };
+export { Brease, type BreaseCollectionResponse, type BreaseConfig, BreaseEditButton, type BreaseNavigationResponse, type BreasePageResponse, type Collection, type Navigation, type Page, type PageSection, SectionToolbar, type SectionToolbarData, createBreaseEditButton, createSectionToolbar, getCollection, getEntryBySlug, getInitializationState, getInstance, getNavigation, getPageByID, getPageBySlug, init, insertBreaseEditButton, insertSectionToolbar, printSections };

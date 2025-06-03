@@ -36,6 +36,8 @@ __export(index_exports, {
   createBreaseEditButton: () => createBreaseEditButton,
   createSectionToolbar: () => createSectionToolbar,
   getCollection: () => getCollection,
+  getEntryBySlug: () => getEntryBySlug,
+  getInitializationState: () => getInitializationState,
   getInstance: () => getInstance,
   getNavigation: () => getNavigation,
   getPageByID: () => getPageByID,
@@ -307,6 +309,26 @@ var Brease = class _Brease {
       throw new Error("Failed to fetch collection: Unknown error");
     }
   }
+  async getEntryBySlug(collectionId, entrySlug, locale) {
+    const isServer = typeof window === "undefined";
+    const endpoint = `/environments/${this.baseEnvironment}/collections/${collectionId}/entry?locale=${locale || "en"}&slug=${entrySlug}`;
+    try {
+      if (isServer) {
+        const response = await this.fetchServerData(endpoint);
+        if (response.message) {
+          throw new Error(response.message);
+        }
+        return response.data.collection;
+      } else {
+        return await this.fetchClientData(endpoint);
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new Error(`Failed to fetch collection: ${error.message}`);
+      }
+      throw new Error("Failed to fetch collection: Unknown error");
+    }
+  }
   async getNavigation(navigationId) {
     const isServer = typeof window === "undefined";
     const endpoint = `/environments/${this.baseEnvironment}/navigations/${navigationId}`;
@@ -350,6 +372,9 @@ async function init(breaseConfig) {
     throw error;
   }
 }
+function getInitializationState() {
+  return { ...initializationState };
+}
 function getInstance() {
   if (initializationState.status !== "initialized" || !initializationState.instance) {
     throw new Error(`Brease is not initialized (current status: ${initializationState.status}). Call init(config) first with your API token and environment.`);
@@ -364,6 +389,9 @@ function getPageBySlug(pageSlug, locale) {
 }
 function getCollection(collectionId) {
   return getInstance().getCollection(collectionId);
+}
+function getEntryBySlug(collectionId, entrySlug, locale) {
+  return getInstance().getEntryBySlug(collectionId, entrySlug, locale);
 }
 function getNavigation(navigationId) {
   return getInstance().getNavigation(navigationId);
