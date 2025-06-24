@@ -7,7 +7,7 @@ export function SectionToolbar({data}:{data:any}) {
             <span className={'brease-section-title'}>{data.name}</span>
         </div>
         <div className={'brease-toolbar-actions'}>
-            <BreaseEditButton id={data.uuid}/>
+            <BreaseEditButton id={data.page_section_uuid}/>
         </div>
     </div>
 }
