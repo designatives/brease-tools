@@ -1,6 +1,6 @@
 {
   "name": "@designatives/brease-tools",
-  "version": "0.0.14",
+  "version": "0.0.15",
   "description": "Brease tools for integrating Brease with your application",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
