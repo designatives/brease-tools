@@ -22,7 +22,7 @@ var BreaseEditButton = ({ id }) => {
   const buttonRef = React.useRef(null);
   React.useEffect(() => {
     const handleClick = () => {
-      BreaseAction("BreaseEditSection", { uuid: id });
+      BreaseAction("BreaseEditSection", { page_section_uuid: id });
     };
     const button = buttonRef.current;
     if (button) {

@@ -25,7 +25,7 @@ export const BreaseEditButton = ({ id }: BreaseEditButtonProps) => {
 
     React.useEffect(() => {
         const handleClick = () => {
-            BreaseAction('BreaseEditSection', { uuid: id });
+            BreaseAction('BreaseEditSection', { page_section_uuid: id });
         };
 
         const button = buttonRef.current;

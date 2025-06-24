@@ -73,7 +73,7 @@ var BreaseEditButton = ({ id }) => {
   const buttonRef = import_react.default.useRef(null);
   import_react.default.useEffect(() => {
     const handleClick = () => {
-      BreaseAction("BreaseEditSection", { uuid: id });
+      BreaseAction("BreaseEditSection", { page_section_uuid: id });
     };
     const button = buttonRef.current;
     if (button) {
