@@ -73,7 +73,7 @@ var BreaseEditButton = ({ id }) => {
   const buttonRef = import_react.default.useRef(null);
   import_react.default.useEffect(() => {
     const handleClick = () => {
-      BreaseAction("BreaseEditSection", { page_section_uuid: id });
+      BreaseAction("BreaseEditSection", { uuid: id });
     };
     const button = buttonRef.current;
     if (button) {
@@ -130,7 +130,7 @@ function printSections(page, componentMap) {
           "figure",
           {
             key: index,
-            id: section.uuid,
+            id: section.page_section_uuid,
             className: "brease-section"
           },
           import_react2.default.createElement(SectionToolbar, { data: section }),
@@ -145,7 +145,7 @@ function printSections(page, componentMap) {
           "figure",
           {
             key: index,
-            id: section.uuid,
+            id: section.page_section_uuid,
             className: "brease-section"
           },
           import_react2.default.createElement(section.component, { data: section.data })

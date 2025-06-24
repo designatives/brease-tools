@@ -22,7 +22,7 @@ export function printSections(page: Page, componentMap: Record<string, React.Com
           'figure',
           { 
             key: index, 
-            id: section.uuid,
+            id: section.page_section_uuid,
             className: 'brease-section'
           },
           React.createElement(SectionToolbar, { data: section }),
@@ -37,7 +37,7 @@ export function printSections(page: Page, componentMap: Record<string, React.Com
           'figure',
           { 
             key: index, 
-            id: section.uuid,
+            id: section.page_section_uuid,
             className: 'brease-section'
           },
           React.createElement(section.component, { data: section.data })

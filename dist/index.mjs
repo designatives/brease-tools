@@ -22,7 +22,7 @@ var BreaseEditButton = ({ id }) => {
   const buttonRef = React.useRef(null);
   React.useEffect(() => {
     const handleClick = () => {
-      BreaseAction("BreaseEditSection", { page_section_uuid: id });
+      BreaseAction("BreaseEditSection", { uuid: id });
     };
     const button = buttonRef.current;
     if (button) {
@@ -79,7 +79,7 @@ function printSections(page, componentMap) {
           "figure",
           {
             key: index,
-            id: section.uuid,
+            id: section.page_section_uuid,
             className: "brease-section"
           },
           React2.createElement(SectionToolbar, { data: section }),
@@ -94,7 +94,7 @@ function printSections(page, componentMap) {
           "figure",
           {
             key: index,
-            id: section.uuid,
+            id: section.page_section_uuid,
             className: "brease-section"
           },
           React2.createElement(section.component, { data: section.data })
