@@ -24,7 +24,7 @@ export function createSectionToolbar(data: SectionToolbarData): HTMLDivElement {
     actionsContainer.className = 'brease-toolbar-actions';
     
     // Create and add edit button
-    const editButton = createBreaseEditButton({ id: data.uuid });
+    const editButton = createBreaseEditButton({ id: data.page_section_uuid });
     actionsContainer.appendChild(editButton);
     
     // Assemble the toolbar
