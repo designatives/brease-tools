@@ -59,7 +59,8 @@ function filterSections(page, componentMap) {
     if (componentMap[section.type]) {
       return {
         component: componentMap[section.type],
-        uuid: section.uuid,
+        page_section_uuid: section.page_section_uuid,
+        section_uuid: section.uuid,
         name: section.name,
         data: section.elements
       };

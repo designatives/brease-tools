@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react"
+import React from "react"
 import { Page } from "../types/types"
 
 export function filterSections(page: Page, componentMap: Record<string, React.ComponentType<any>>) {
@@ -6,7 +6,8 @@ export function filterSections(page: Page, componentMap: Record<string, React.Co
     if (componentMap[section.type]) {
       return {
         component: componentMap[section.type],
-        uuid: section.uuid,
+        page_section_uuid: section.page_section_uuid,
+        section_uuid: section.uuid,
         name: section.name,
         data: section.elements
       }

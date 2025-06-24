@@ -20,6 +20,7 @@ export interface Page {
 export interface PageSection {
   type: string
   uuid: string
+  page_section_uuid: string
   name: string
   elements: []
 }
