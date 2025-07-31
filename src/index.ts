@@ -13,16 +13,21 @@ export {
   getPageBySlug, 
   getCollection, 
   getEntryBySlug,
-  getNavigation 
+  getNavigation,
+  getRedirects
 } from './ts/brease';
 export type { 
   BreaseConfig, 
-  Page, 
+  Page,
   PageSection, 
   Collection, 
-  Navigation, 
+  Navigation,
+  Redirect,
+  Entry,
   BreasePageResponse, 
   BreaseCollectionResponse, 
-  BreaseNavigationResponse 
+  BreaseNavigationResponse ,
+  BreaseRedirectsResponse,
+  BreaseEntryResponse
 } from './types/types';
 export type { SectionToolbarData } from './ts/ui/SectionToolbar';

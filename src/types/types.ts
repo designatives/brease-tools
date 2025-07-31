@@ -42,6 +42,13 @@ export interface Entry {
   elements: any[]
 }
 
+export interface Redirect {
+  uuid: string
+  source: string
+  destination: string
+  type: 301 | 302 | 307 | 308
+}
+
 export interface BreasePageResponse extends Response {
   data: {
     page: Page
@@ -66,6 +73,13 @@ export interface BreaseEntryResponse extends Response {
 export interface BreaseNavigationResponse extends Response {
   data: {
     navigation: Navigation
+  }
+  message: string | null
+}
+
+export interface BreaseRedirectsResponse extends Response {
+  data: {
+    redirects: Redirect[]
   }
   message: string | null
 }

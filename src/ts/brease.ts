@@ -1,4 +1,4 @@
-import { BreaseConfig, Page, BreasePageResponse, Collection, BreaseCollectionResponse, Navigation, BreaseNavigationResponse, BreaseEntryResponse, Entry } from "../types/types"
+import { BreaseConfig, Page, BreasePageResponse, Collection, BreaseCollectionResponse, Navigation, BreaseNavigationResponse, BreaseEntryResponse, Entry, BreaseRedirectsResponse, Redirect } from "../types/types"
 
 type InitializationState = {
   status: 'uninitialized' | 'initializing' | 'initialized' | 'error';
@@ -168,6 +168,28 @@ export class Brease {
       throw new Error('Failed to fetch navigation: Unknown error');
     }
   }
+
+  async getRedirects(): Promise<Redirect[]> {
+    const isServer = typeof window === 'undefined';
+    const endpoint = `/environments/${this.baseEnvironment}/redirects`;
+    
+    try {
+      if (isServer) {
+        const response = (await this.fetchServerData(endpoint)) as BreaseRedirectsResponse;
+        if (response.message) {
+          throw new Error(response.message);
+        }
+        return response.data.redirects;
+      } else {
+        return await this.fetchClientData(endpoint);
+      }
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        throw new Error(`Failed to fetch redirects: ${error.message}`);
+      }
+      throw new Error('Failed to fetch redirects: Unknown error');
+    }
+  }
 }
 
 /**
@@ -242,4 +264,8 @@ export function getEntryBySlug(collectionId: string, entrySlug: string, locale?:
 
 export function getNavigation(navigationId: string): Promise<Navigation> {
   return getInstance().getNavigation(navigationId);
+}
+
+export function getRedirects(): Promise<Redirect[]> {
+  return getInstance().getRedirects();
 }
