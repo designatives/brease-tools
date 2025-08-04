@@ -369,9 +369,59 @@ function getNavigation(navigationId) {
 function getRedirects() {
   return getInstance().getRedirects();
 }
+
+// src/ts/brease-ssr.ts
+var BreaseSSR = class {
+  static createClient(config) {
+    return Brease.createInstance(config);
+  }
+  /**
+   * Get a page by its slug in SSR context
+   */
+  static async getPageBySlug(config, pageSlug, locale) {
+    const client = this.createClient(config);
+    return client.getPageBySlug(pageSlug, locale);
+  }
+  /**
+   * Get a page by its ID in SSR context
+   */
+  static async getPageByID(config, pageId) {
+    const client = this.createClient(config);
+    return client.getPageByID(pageId);
+  }
+  /**
+   * Get navigation data in SSR context
+   */
+  static async getNavigation(config, navigationId) {
+    const client = this.createClient(config);
+    return client.getNavigation(navigationId);
+  }
+  /**
+   * Get collection data in SSR context
+   */
+  static async getCollection(config, collectionId) {
+    const client = this.createClient(config);
+    return client.getCollection(collectionId);
+  }
+  /**
+   * Get an entry by its slug in SSR context
+   */
+  static async getEntryBySlug(config, collectionId, entrySlug, locale) {
+    const client = this.createClient(config);
+    return client.getEntryBySlug(collectionId, entrySlug, locale);
+  }
+  /**
+   * Get redirects data in SSR context
+   */
+  static async getRedirects(config) {
+    const client = this.createClient(config);
+    return client.getRedirects();
+  }
+};
 export {
   Brease,
   BreaseEditButton,
+  BreaseSSR,
   SectionToolbar,
   createBreaseEditButton,
   createSectionToolbar,

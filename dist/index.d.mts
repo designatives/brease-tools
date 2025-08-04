@@ -147,4 +147,37 @@ declare function getEntryBySlug(collectionId: string, entrySlug: string, locale?
 declare function getNavigation(navigationId: string): Promise<Navigation>;
 declare function getRedirects(): Promise<Redirect[]>;
 
-export { Brease, type BreaseCollectionResponse, type BreaseConfig, BreaseEditButton, type BreaseEntryResponse, type BreaseNavigationResponse, type BreasePageResponse, type BreaseRedirectsResponse, type Collection, type Entry, type Navigation, type Page, type PageSection, type Redirect, SectionToolbar, type SectionToolbarData, createBreaseEditButton, createSectionToolbar, getCollection, getEntryBySlug, getInitializationState, getInstance, getNavigation, getPageByID, getPageBySlug, getRedirects, init, insertBreaseEditButton, insertSectionToolbar, printSections };
+/**
+ * SSR-safe Brease utilities that don't rely on global state.
+ * Each method creates its own client instance, making it safe for server-side rendering
+ * where global state might not persist between requests.
+ */
+declare class BreaseSSR {
+    private static createClient;
+    /**
+     * Get a page by its slug in SSR context
+     */
+    static getPageBySlug(config: BreaseConfig, pageSlug: string, locale?: string): Promise<Page>;
+    /**
+     * Get a page by its ID in SSR context
+     */
+    static getPageByID(config: BreaseConfig, pageId: string): Promise<Page>;
+    /**
+     * Get navigation data in SSR context
+     */
+    static getNavigation(config: BreaseConfig, navigationId: string): Promise<Navigation>;
+    /**
+     * Get collection data in SSR context
+     */
+    static getCollection(config: BreaseConfig, collectionId: string): Promise<Collection>;
+    /**
+     * Get an entry by its slug in SSR context
+     */
+    static getEntryBySlug(config: BreaseConfig, collectionId: string, entrySlug: string, locale?: string): Promise<Entry>;
+    /**
+     * Get redirects data in SSR context
+     */
+    static getRedirects(config: BreaseConfig): Promise<Redirect[]>;
+}
+
+export { Brease, type BreaseCollectionResponse, type BreaseConfig, BreaseEditButton, type BreaseEntryResponse, type BreaseNavigationResponse, type BreasePageResponse, type BreaseRedirectsResponse, BreaseSSR, type Collection, type Entry, type Navigation, type Page, type PageSection, type Redirect, SectionToolbar, type SectionToolbarData, createBreaseEditButton, createSectionToolbar, getCollection, getEntryBySlug, getInitializationState, getInstance, getNavigation, getPageByID, getPageBySlug, getRedirects, init, insertBreaseEditButton, insertSectionToolbar, printSections };

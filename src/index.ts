@@ -16,6 +16,7 @@ export {
   getNavigation,
   getRedirects
 } from './ts/brease';
+export { BreaseSSR } from './ts/brease-ssr';
 export type { 
   BreaseConfig, 
   Page,
