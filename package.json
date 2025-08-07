@@ -38,7 +38,7 @@
   "homepage": "https://github.com/designatives/brease-tools#readme",
   "devDependencies": {
     "@types/node": "^22.13.10",
-    "@types/react": "^19.0.12",
+    "@types/react": "^18.0.0 || ^19.0.0",
     "tslib": "^2.8.1",
     "tsup": "^8.4.0",
     "typescript": "^5.8.2"
@@ -48,7 +48,7 @@
     "undici-types": "^6.20.0"
   },
   "peerDependencies": {
-    "react": "^18.3.1",
-    "react-dom": "^18.0.0"
+    "react": "^18.0.0 || ^19.0.0",
+    "react-dom": "^18.0.0 || ^19.0.0"
   }
 }
