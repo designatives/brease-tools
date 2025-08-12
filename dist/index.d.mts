@@ -24,7 +24,7 @@ interface PageSection {
     uuid: string;
     page_section_uuid: string;
     name: string;
-    elements: any[];
+    elements: any;
 }
 interface Collection {
     uuid: string;
@@ -38,7 +38,7 @@ interface Entry {
     uuid: string;
     name: string;
     slug: string;
-    elements: any[];
+    elements: any;
 }
 interface Redirect {
     uuid: string;

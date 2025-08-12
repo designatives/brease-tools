@@ -23,7 +23,7 @@ export interface PageSection {
   uuid: string
   page_section_uuid: string
   name: string
-  elements: any[]
+  elements: any
 }
 
 export interface Collection {
@@ -40,7 +40,7 @@ export interface Entry {
   uuid: string
   name: string
   slug: string
-  elements: any[]
+  elements: any
 }
 
 export interface Redirect {
