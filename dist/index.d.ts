@@ -10,6 +10,7 @@ interface BreaseConfig {
 interface Page {
     name: string;
     sections: PageSection[];
+    variables: any;
     customCode: string | null;
     openGraphUrl: string | null;
     openGraphType: string;
@@ -23,7 +24,7 @@ interface PageSection {
     uuid: string;
     page_section_uuid: string;
     name: string;
-    elements: [];
+    elements: any[];
 }
 interface Collection {
     uuid: string;

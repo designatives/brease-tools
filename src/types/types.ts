@@ -8,6 +8,7 @@ export interface BreaseConfig {
 export interface Page {
   name: string
   sections: PageSection[]
+  variables: any,
   customCode: string | null,
   openGraphUrl: string | null,
   openGraphType: string,
@@ -22,7 +23,7 @@ export interface PageSection {
   uuid: string
   page_section_uuid: string
   name: string
-  elements: []
+  elements: any[]
 }
 
 export interface Collection {
