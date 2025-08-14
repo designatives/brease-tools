@@ -24,6 +24,18 @@ export class BreaseSSR {
   }
 
   /**
+   * Get a page metadata by its slug in SSR context
+   */
+  static async getPageMetaBySlug(
+    config: BreaseConfig, 
+    pageSlug: string, 
+    locale?: string
+  ): Promise<Page> {
+    const client = this.createClient(config)
+    return client.getPageMetaBySlug(pageSlug, locale)
+  }
+
+  /**
    * Get a page by its ID in SSR context
    */
   static async getPageByID(config: BreaseConfig, pageId: string): Promise<Page> {

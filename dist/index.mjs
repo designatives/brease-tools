@@ -239,6 +239,26 @@ var Brease = class _Brease {
       throw new Error("Failed to fetch page by slug: Unknown error");
     }
   }
+  async getPageMetaBySlug(pageSlug, locale) {
+    const isServer = typeof window === "undefined";
+    const endpoint = `/environments/${this.baseEnvironment}/page?locale=${locale || "en"}&slug=${pageSlug}&metaOnly=1`;
+    try {
+      if (isServer) {
+        const response = await this.fetchServerData(endpoint);
+        if (response.message) {
+          throw new Error(response.message);
+        }
+        return response.data.page;
+      } else {
+        return await this.fetchClientData(endpoint);
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new Error(`Failed to fetch page metadata by slug: ${error.message}`);
+      }
+      throw new Error("Failed to fetch pag metadata by slug: Unknown error");
+    }
+  }
   async getCollection(collectionId) {
     const isServer = typeof window === "undefined";
     const endpoint = `/environments/${this.baseEnvironment}/collections/${collectionId}`;
@@ -381,6 +401,13 @@ var BreaseSSR = class {
   static async getPageBySlug(config, pageSlug, locale) {
     const client = this.createClient(config);
     return client.getPageBySlug(pageSlug, locale);
+  }
+  /**
+   * Get a page metadata by its slug in SSR context
+   */
+  static async getPageMetaBySlug(config, pageSlug, locale) {
+    const client = this.createClient(config);
+    return client.getPageMetaBySlug(pageSlug, locale);
   }
   /**
    * Get a page by its ID in SSR context

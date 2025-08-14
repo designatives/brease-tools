@@ -103,6 +103,28 @@ export class Brease {
     }
   }
 
+  async getPageMetaBySlug(pageSlug: string, locale?: string): Promise<Page> {
+    const isServer = typeof window === 'undefined';
+    const endpoint = `/environments/${this.baseEnvironment}/page?locale=${locale||'en'}&slug=${pageSlug}&metaOnly=1`;
+    
+    try {
+      if (isServer) {
+        const response = (await this.fetchServerData(endpoint)) as BreasePageResponse;
+        if (response.message) {
+          throw new Error(response.message);
+        }
+        return response.data.page;
+      } else {
+        return await this.fetchClientData(endpoint);
+      }
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        throw new Error(`Failed to fetch page metadata by slug: ${error.message}`);
+      }
+      throw new Error('Failed to fetch pag metadata by slug: Unknown error');
+    }
+  }
+
   async getCollection(collectionId: string): Promise<Collection> {
     const isServer = typeof window === 'undefined';
     const endpoint = `/environments/${this.baseEnvironment}/collections/${collectionId}`;

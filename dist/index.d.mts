@@ -122,6 +122,7 @@ declare class Brease {
     private fetchClientData;
     getPageByID(pageId: string): Promise<Page>;
     getPageBySlug(pageSlug: string, locale?: string): Promise<Page>;
+    getPageMetaBySlug(pageSlug: string, locale?: string): Promise<Page>;
     getCollection(collectionId: string): Promise<Collection>;
     getEntryBySlug(collectionId: string, entrySlug: string, locale?: string): Promise<Entry>;
     getNavigation(navigationId: string): Promise<Navigation>;
@@ -159,6 +160,10 @@ declare class BreaseSSR {
      * Get a page by its slug in SSR context
      */
     static getPageBySlug(config: BreaseConfig, pageSlug: string, locale?: string): Promise<Page>;
+    /**
+     * Get a page metadata by its slug in SSR context
+     */
+    static getPageMetaBySlug(config: BreaseConfig, pageSlug: string, locale?: string): Promise<Page>;
     /**
      * Get a page by its ID in SSR context
      */
