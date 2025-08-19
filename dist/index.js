@@ -123,7 +123,7 @@ function filterSections(page, componentMap) {
 }
 
 // src/react/printSections.ts
-function printSections(page, componentMap) {
+function printSections(page, componentMap, optionalData) {
   const sections = filterSections(page, componentMap);
   const isInIframe = typeof window !== "undefined" && window.self !== window.top;
   return sections?.map((section, index) => {
@@ -141,7 +141,7 @@ function printSections(page, componentMap) {
           import_react2.default.createElement("div", {
             className: "brease-preview-overlay"
           }),
-          import_react2.default.createElement(section.component, { data: section.data })
+          import_react2.default.createElement(section.component, { data: section.data, extra: optionalData || null })
         );
       } else {
         return import_react2.default.createElement(
@@ -151,7 +151,7 @@ function printSections(page, componentMap) {
             id: section.page_section_uuid,
             className: "brease-section"
           },
-          import_react2.default.createElement(section.component, { data: section.data })
+          import_react2.default.createElement(section.component, { data: section.data, extra: optionalData || null })
         );
       }
     }

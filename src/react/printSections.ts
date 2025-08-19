@@ -4,7 +4,7 @@ import { SectionToolbar } from './ui/SectionToolbar';
 import { filterSections } from './filterSections';
 
 // Export as a named function declaration (not an arrow function or method)
-export function printSections(page: Page, componentMap: Record<string, React.ComponentType<any>>): ReactNode[] {
+export function printSections(page: Page, componentMap: Record<string, React.ComponentType<any>>, optionalData?: any): ReactNode[] {
   const sections = filterSections(page, componentMap);
   const isInIframe = typeof window !== 'undefined' && window.self !== window.top;
   //TODO: isIframe for now => handle actual auth here
@@ -30,7 +30,7 @@ export function printSections(page: Page, componentMap: Record<string, React.Com
           React.createElement('div', {
             className: 'brease-preview-overlay',
           }),
-          React.createElement(section.component, { data: section.data })
+          React.createElement(section.component, { data: section.data, extra: optionalData || null })
         );
       } else {
         return React.createElement(
@@ -40,7 +40,7 @@ export function printSections(page: Page, componentMap: Record<string, React.Com
             id: section.page_section_uuid,
             className: 'brease-section'
           },
-          React.createElement(section.component, { data: section.data })
+          React.createElement(section.component, { data: section.data, extra: optionalData || null})
         );
       }
     }

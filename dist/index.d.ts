@@ -77,7 +77,7 @@ interface BreaseRedirectsResponse extends Response {
     message: string | null;
 }
 
-declare function printSections(page: Page, componentMap: Record<string, React.ComponentType<any>>): ReactNode[];
+declare function printSections(page: Page, componentMap: Record<string, React.ComponentType<any>>, optionalData?: any): ReactNode[];
 
 declare function SectionToolbar({ data }: {
     data: any;
