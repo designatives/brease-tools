@@ -6,15 +6,17 @@ export interface BreaseConfig {
 }
 
 export interface Page {
+  uuid: string
   name: string
+  slug: string
   sections: PageSection[]
-  variables: any,
-  customCode: string | null,
-  openGraphUrl: string | null,
-  openGraphType: string,
-  openGraphImage: string | null,
-  openGraphTitle: string | null,
-  metaDescription: string | null,
+  variables: any
+  customCode: string | null
+  openGraphUrl: string | null
+  openGraphType: string
+  openGraphImage: string | null
+  openGraphTitle: string | null
+  metaDescription: string | null
   openGraphDescription: string | null
 }
 

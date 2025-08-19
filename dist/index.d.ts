@@ -8,7 +8,9 @@ interface BreaseConfig {
     proxyUrl?: string;
 }
 interface Page {
+    uuid: string;
     name: string;
+    slug: string;
     sections: PageSection[];
     variables: any;
     customCode: string | null;
