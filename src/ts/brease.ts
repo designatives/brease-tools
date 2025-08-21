@@ -75,9 +75,9 @@ export class Brease {
       }
     } catch (error: unknown) {
       if (error instanceof Error) {
-        throw new Error(`Failed to fetch page by ID: ${error.message}`);
+        throw new Error(`Failed to fetch page: ${error.message}`);
       }
-      throw new Error('Failed to fetch page by ID: Unknown error');
+      throw new Error('Failed to fetch page: Unknown error');
     }
   }
 
@@ -97,9 +97,9 @@ export class Brease {
       }
     } catch (error: unknown) {
       if (error instanceof Error) {
-        throw new Error(`Failed to fetch page by slug: ${error.message}`);
+        throw new Error(`Failed to fetch page: ${error.message}`);
       }
-      throw new Error('Failed to fetch page by slug: Unknown error');
+      throw new Error('Failed to fetch page: Unknown error');
     }
   }
 
@@ -119,9 +119,9 @@ export class Brease {
       }
     } catch (error: unknown) {
       if (error instanceof Error) {
-        throw new Error(`Failed to fetch page metadata by slug: ${error.message}`);
+        throw new Error(`Failed to fetch page metadata: ${error.message}`);
       }
-      throw new Error('Failed to fetch pag metadata by slug: Unknown error');
+      throw new Error('Failed to fetch pag metadata: Unknown error');
     }
   }
 
@@ -163,7 +163,29 @@ export class Brease {
       }
     } catch (error: unknown) {
       if (error instanceof Error) {
-        throw new Error(`Failed to fetch collection: ${error.message}`);
+        throw new Error(`Failed to fetch entry: ${error.message}`);
+      }
+      throw new Error('Failed to fetch collection: Unknown error');
+    }
+  }
+
+  async getEntryByID(collectionId: string, entryId:string, locale?: string): Promise<Entry> {
+    const isServer = typeof window === 'undefined';
+    const endpoint = `/environments/${this.baseEnvironment}/collections/${collectionId}/entry/${entryId}?locale=${locale || 'en'}`;
+    
+    try {
+      if (isServer) {
+        const response = (await this.fetchServerData(endpoint)) as BreaseEntryResponse;
+        if (response.message) {
+          throw new Error(response.message);
+        }
+        return response.data.entry;
+      } else {
+        return await this.fetchClientData(endpoint);
+      }
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        throw new Error(`Failed to fetch entry: ${error.message}`);
       }
       throw new Error('Failed to fetch collection: Unknown error');
     }
@@ -282,6 +304,10 @@ export function getCollection(collectionId: string): Promise<Collection> {
 
 export function getEntryBySlug(collectionId: string, entrySlug: string, locale?: string): Promise<Entry> {
   return getInstance().getEntryBySlug(collectionId, entrySlug, locale);
+}
+
+export function getEntryByID(collectionId: string, entryId: string, locale?: string): Promise<Entry> {
+  return getInstance().getEntryByID(collectionId, entryId, locale);
 }
 
 export function getNavigation(navigationId: string): Promise<Navigation> {

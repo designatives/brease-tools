@@ -13,6 +13,7 @@ export {
   getPageBySlug, 
   getCollection, 
   getEntryBySlug,
+  getEntryByID,
   getNavigation,
   getRedirects
 } from './ts/brease';

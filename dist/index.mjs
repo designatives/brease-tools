@@ -214,9 +214,9 @@ var Brease = class _Brease {
       }
     } catch (error) {
       if (error instanceof Error) {
-        throw new Error(`Failed to fetch page by ID: ${error.message}`);
+        throw new Error(`Failed to fetch page: ${error.message}`);
       }
-      throw new Error("Failed to fetch page by ID: Unknown error");
+      throw new Error("Failed to fetch page: Unknown error");
     }
   }
   async getPageBySlug(pageSlug, locale) {
@@ -234,9 +234,9 @@ var Brease = class _Brease {
       }
     } catch (error) {
       if (error instanceof Error) {
-        throw new Error(`Failed to fetch page by slug: ${error.message}`);
+        throw new Error(`Failed to fetch page: ${error.message}`);
       }
-      throw new Error("Failed to fetch page by slug: Unknown error");
+      throw new Error("Failed to fetch page: Unknown error");
     }
   }
   async getPageMetaBySlug(pageSlug, locale) {
@@ -254,9 +254,9 @@ var Brease = class _Brease {
       }
     } catch (error) {
       if (error instanceof Error) {
-        throw new Error(`Failed to fetch page metadata by slug: ${error.message}`);
+        throw new Error(`Failed to fetch page metadata: ${error.message}`);
       }
-      throw new Error("Failed to fetch pag metadata by slug: Unknown error");
+      throw new Error("Failed to fetch pag metadata: Unknown error");
     }
   }
   async getCollection(collectionId) {
@@ -294,7 +294,27 @@ var Brease = class _Brease {
       }
     } catch (error) {
       if (error instanceof Error) {
-        throw new Error(`Failed to fetch collection: ${error.message}`);
+        throw new Error(`Failed to fetch entry: ${error.message}`);
+      }
+      throw new Error("Failed to fetch collection: Unknown error");
+    }
+  }
+  async getEntryByID(collectionId, entryId, locale) {
+    const isServer = typeof window === "undefined";
+    const endpoint = `/environments/${this.baseEnvironment}/collections/${collectionId}/entry/${entryId}?locale=${locale || "en"}`;
+    try {
+      if (isServer) {
+        const response = await this.fetchServerData(endpoint);
+        if (response.message) {
+          throw new Error(response.message);
+        }
+        return response.data.entry;
+      } else {
+        return await this.fetchClientData(endpoint);
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new Error(`Failed to fetch entry: ${error.message}`);
       }
       throw new Error("Failed to fetch collection: Unknown error");
     }
@@ -383,6 +403,9 @@ function getCollection(collectionId) {
 function getEntryBySlug(collectionId, entrySlug, locale) {
   return getInstance().getEntryBySlug(collectionId, entrySlug, locale);
 }
+function getEntryByID(collectionId, entryId, locale) {
+  return getInstance().getEntryByID(collectionId, entryId, locale);
+}
 function getNavigation(navigationId) {
   return getInstance().getNavigation(navigationId);
 }
@@ -438,6 +461,13 @@ var BreaseSSR = class {
     return client.getEntryBySlug(collectionId, entrySlug, locale);
   }
   /**
+   * Get an entry by its ID in SSR context
+   */
+  static async getEntryByID(config, collectionId, entryId, locale) {
+    const client = this.createClient(config);
+    return client.getEntryByID(collectionId, entryId, locale);
+  }
+  /**
    * Get redirects data in SSR context
    */
   static async getRedirects(config) {
@@ -453,6 +483,7 @@ export {
   createBreaseEditButton,
   createSectionToolbar,
   getCollection,
+  getEntryByID,
   getEntryBySlug,
   getInitializationState,
   getInstance,

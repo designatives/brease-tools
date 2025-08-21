@@ -73,6 +73,19 @@ export class BreaseSSR {
   }
 
   /**
+   * Get an entry by its ID in SSR context
+   */
+  static async getEntryByID(
+    config: BreaseConfig, 
+    collectionId: string, 
+    entryId: string,
+    locale?: string
+  ): Promise<Entry> {
+    const client = this.createClient(config)
+    return client.getEntryByID(collectionId, entryId, locale)
+  }
+
+  /**
    * Get redirects data in SSR context
    */
   static async getRedirects(config: BreaseConfig): Promise<Redirect[]> {
