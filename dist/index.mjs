@@ -74,8 +74,8 @@ function printSections(page, componentMap, optionalData) {
   const sections = filterSections(page, componentMap);
   const isInIframe = typeof window !== "undefined" && window.self !== window.top;
   if (isInIframe) {
-    const el = document.getElementById("brease-app-body");
-    if (el) el.setAttribute("data-brease-preview", "true");
+    const html = document.getElementsByTagName("html")[0];
+    if (html) html.dataset.breasePreview = true;
   }
   return sections?.map((section, index) => {
     if (section) {

@@ -25,11 +25,11 @@
     overflow: hidden;
 }
 
-*[data-brease-preview] *[data-brease-hidden]{
+html[data-brease-preview=true] *[data-brease-hidden=true]{
     display: none;
 }
 
-*[data-brease-preview] *[data-brease-invisible] {
+html[data-brease-preview=true] *[data-brease-invisible=true] {
     visibility: hidden;
 }
 
