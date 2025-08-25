@@ -73,10 +73,6 @@ function filterSections(page, componentMap) {
 function printSections(page, componentMap, optionalData) {
   const sections = filterSections(page, componentMap);
   const isInIframe = typeof window !== "undefined" && window.self !== window.top;
-  if (isInIframe) {
-    const html = document.getElementsByTagName("html")[0];
-    if (html) html.dataset.breasePreview = true;
-  }
   return sections?.map((section, index) => {
     if (section) {
       if (isInIframe) {
@@ -415,6 +411,43 @@ function getNavigation(navigationId) {
 function getRedirects() {
   return getInstance().getRedirects();
 }
+function setBreasePreviewAttribute() {
+  const isInIframe = typeof window !== "undefined" && window.self !== window.top;
+  if (isInIframe) {
+    const html = document.getElementsByTagName("html")[0];
+    if (html) {
+      html.dataset.breasePreview = true;
+    }
+  }
+}
+function getBreasePreviewScript() {
+  return `
+    (function() {
+      const isInIframe = typeof window !== 'undefined' && window.self !== window.top;
+      if (isInIframe) {
+        // In preview mode toggle this data attribute for hiding elements
+        const html = document.getElementsByTagName('html')[0];
+        if (html) {
+          //@ts-ignore
+          html.dataset.breasePreview = true;
+        }
+      }
+    })();
+  `;
+}
+function getBreasePreviewScriptContent() {
+  return `
+    const isInIframe = typeof window !== 'undefined' && window.self !== window.top;
+    if (isInIframe) {
+      // In preview mode toggle this data attribute for hiding elements
+      const html = document.getElementsByTagName('html')[0];
+      if (html) {
+        //@ts-ignore
+        html.dataset.breasePreview = true;
+      }
+    }
+  `;
+}
 
 // src/ts/brease-ssr.ts
 var BreaseSSR = class {
@@ -485,6 +518,8 @@ export {
   SectionToolbar,
   createBreaseEditButton,
   createSectionToolbar,
+  getBreasePreviewScript,
+  getBreasePreviewScriptContent,
   getCollection,
   getEntryByID,
   getEntryBySlug,
@@ -497,5 +532,6 @@ export {
   init,
   insertBreaseEditButton,
   insertSectionToolbar,
-  printSections
+  printSections,
+  setBreasePreviewAttribute
 };

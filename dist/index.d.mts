@@ -152,6 +152,9 @@ declare function getEntryBySlug(collectionId: string, entrySlug: string, locale?
 declare function getEntryByID(collectionId: string, entryId: string, locale?: string): Promise<Entry>;
 declare function getNavigation(navigationId: string): Promise<Navigation>;
 declare function getRedirects(): Promise<Redirect[]>;
+declare function setBreasePreviewAttribute(): void;
+declare function getBreasePreviewScript(): string;
+declare function getBreasePreviewScriptContent(): string;
 
 /**
  * SSR-safe Brease utilities that don't rely on global state.
@@ -194,4 +197,4 @@ declare class BreaseSSR {
     static getRedirects(config: BreaseConfig): Promise<Redirect[]>;
 }
 
-export { Brease, type BreaseCollectionResponse, type BreaseConfig, BreaseEditButton, type BreaseEntryResponse, type BreaseNavigationResponse, type BreasePageResponse, type BreaseRedirectsResponse, BreaseSSR, type Collection, type Entry, type Navigation, type Page, type PageSection, type Redirect, SectionToolbar, type SectionToolbarData, createBreaseEditButton, createSectionToolbar, getCollection, getEntryByID, getEntryBySlug, getInitializationState, getInstance, getNavigation, getPageByID, getPageBySlug, getRedirects, init, insertBreaseEditButton, insertSectionToolbar, printSections };
+export { Brease, type BreaseCollectionResponse, type BreaseConfig, BreaseEditButton, type BreaseEntryResponse, type BreaseNavigationResponse, type BreasePageResponse, type BreaseRedirectsResponse, BreaseSSR, type Collection, type Entry, type Navigation, type Page, type PageSection, type Redirect, SectionToolbar, type SectionToolbarData, createBreaseEditButton, createSectionToolbar, getBreasePreviewScript, getBreasePreviewScriptContent, getCollection, getEntryByID, getEntryBySlug, getInitializationState, getInstance, getNavigation, getPageByID, getPageBySlug, getRedirects, init, insertBreaseEditButton, insertSectionToolbar, printSections, setBreasePreviewAttribute };

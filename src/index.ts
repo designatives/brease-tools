@@ -15,7 +15,10 @@ export {
   getEntryBySlug,
   getEntryByID,
   getNavigation,
-  getRedirects
+  getRedirects,
+  setBreasePreviewAttribute,
+  getBreasePreviewScript,
+  getBreasePreviewScriptContent,
 } from './ts/brease';
 export { BreaseSSR } from './ts/brease-ssr';
 export type { 

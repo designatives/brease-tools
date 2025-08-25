@@ -316,3 +316,48 @@ export function getNavigation(navigationId: string): Promise<Navigation> {
 export function getRedirects(): Promise<Redirect[]> {
   return getInstance().getRedirects();
 }
+
+// Export the iframe detection and data attribute setting logic
+export function setBreasePreviewAttribute(): void {
+  const isInIframe = typeof window !== 'undefined' && window.self !== window.top;
+  if (isInIframe) {
+    // In preview mode toggle this data attribute for hiding elements
+    const html = document.getElementsByTagName('html')[0];
+    if (html) {
+      //@ts-ignore
+      html.dataset.breasePreview = true;
+    }
+  }
+}
+
+// Function that returns the script content as a string for next/script
+export function getBreasePreviewScript(): string {
+  return `
+    (function() {
+      const isInIframe = typeof window !== 'undefined' && window.self !== window.top;
+      if (isInIframe) {
+        // In preview mode toggle this data attribute for hiding elements
+        const html = document.getElementsByTagName('html')[0];
+        if (html) {
+          //@ts-ignore
+          html.dataset.breasePreview = true;
+        }
+      }
+    })();
+  `;
+}
+
+// Function that returns the script content as a string for plain JS
+export function getBreasePreviewScriptContent(): string {
+  return `
+    const isInIframe = typeof window !== 'undefined' && window.self !== window.top;
+    if (isInIframe) {
+      // In preview mode toggle this data attribute for hiding elements
+      const html = document.getElementsByTagName('html')[0];
+      if (html) {
+        //@ts-ignore
+        html.dataset.breasePreview = true;
+      }
+    }
+  `;
+}
