@@ -127,6 +127,10 @@ function filterSections(page, componentMap) {
 function printSections(page, componentMap, optionalData) {
   const sections = filterSections(page, componentMap);
   const isInIframe = typeof window !== "undefined" && window.self !== window.top;
+  if (isInIframe) {
+    const html = document.getElementsByTagName("html")[0];
+    if (html) html.setAttribute("data-brease-preview", "true");
+  }
   return sections?.map((section, index) => {
     if (section) {
       if (isInIframe) {

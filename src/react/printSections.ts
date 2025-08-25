@@ -8,16 +8,14 @@ export function printSections(page: Page, componentMap: Record<string, React.Com
   const sections = filterSections(page, componentMap);
   const isInIframe = typeof window !== 'undefined' && window.self !== window.top;
   //TODO: isIframe for now => handle actual auth here
+  if(isInIframe){
+    // In preview mode toggle this data attribute for hiding elements
+    const html = document.getElementsByTagName('html')[0];
+    if (html) html.setAttribute('data-brease-preview', 'true');
+  }
   return sections?.map((section: any, index: number) => {
     if (section) {
       if (isInIframe) {
-        //TODO: Hide navigations (next ver)
-        // requestAnimationFrame(() => {
-        //   const breaseNavigations = window.self.document.getElementsByTagName('nav');
-        //   Array.from(breaseNavigations).forEach(nav => {
-        //     nav.classList.add('brease-preview-hidden');
-        //   })
-        // })
         return React.createElement(
           'figure',
           { 

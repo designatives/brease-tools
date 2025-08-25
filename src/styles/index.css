@@ -25,6 +25,14 @@
     overflow: hidden;
 }
 
+html[data-brease-preview] *[data-brease-hidden]{
+    display: none;
+}
+
+html[data-brease-preview] *[data-brease-invisible] {
+    visibility: hidden;
+}
+
 /* Section Toolbar */
 .brease-section-toolbar {
     background-color: rgba(245, 246, 248, 0.6);

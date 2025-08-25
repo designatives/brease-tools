@@ -21,6 +21,12 @@
   max-height: 48px;
   overflow: hidden;
 }
+html[data-brease-preview] *[data-brease-hidden] {
+  display: none;
+}
+html[data-brease-preview] *[data-brease-invisible] {
+  visibility: hidden;
+}
 .brease-section-toolbar {
   background-color: rgba(245, 246, 248, 0.6);
   backdrop-filter: blur(20px);
