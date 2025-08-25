@@ -25,11 +25,11 @@
     overflow: hidden;
 }
 
-html[data-brease-preview] *[data-brease-hidden]{
+*[data-brease-preview] *[data-brease-hidden]{
     display: none;
 }
 
-html[data-brease-preview] *[data-brease-invisible] {
+*[data-brease-preview] *[data-brease-invisible] {
     visibility: hidden;
 }
 

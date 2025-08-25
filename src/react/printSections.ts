@@ -10,8 +10,8 @@ export function printSections(page: Page, componentMap: Record<string, React.Com
   //TODO: isIframe for now => handle actual auth here
   if(isInIframe){
     // In preview mode toggle this data attribute for hiding elements
-    const html = document.getElementsByTagName('html')[0];
-    if (html) html.setAttribute('data-brease-preview', 'true');
+    const el = document.getElementById('brease-app-body');
+    if (el) el.setAttribute('data-brease-preview', 'true');
   }
   return sections?.map((section: any, index: number) => {
     if (section) {
