@@ -1,6 +1,6 @@
 import React, { ReactNode } from 'react';
-import { Page } from '../types/types';
-import { SectionToolbar } from './ui/SectionToolbar';
+import { Page } from '../../brease/types';
+import { SectionToolbar } from '../../ui/react/SectionToolbar';
 import { filterSections } from './filterSections';
 
 // Export as a named function declaration (not an arrow function or method)

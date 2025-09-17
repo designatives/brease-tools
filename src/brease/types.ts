@@ -86,3 +86,22 @@ export interface BreaseRedirectsResponse extends Response {
   }
   message: string | null
 }
+
+// TypeScript/JS Utility Types
+export interface ComponentRenderer {
+  (data: any, extra?: any): HTMLElement;
+}
+
+export interface FilteredSection {
+  component: ComponentRenderer;
+  page_section_uuid: string;
+  section_uuid: string;
+  name: string;
+  data: any;
+}
+
+export interface PrintSectionsOptions {
+  container?: HTMLElement;
+  optionalData?: any;
+  enablePreview?: boolean;
+}

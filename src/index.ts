@@ -1,9 +1,6 @@
 import './styles/index.css';
-export { printSections } from './react/printSections';
-export { SectionToolbar } from './react/ui/SectionToolbar';
-export { BreaseEditButton } from './react/ui/SectionToolbar/SectionEditButton';
-export { createSectionToolbar, insertSectionToolbar } from './ts/ui/SectionToolbar';
-export { createBreaseEditButton, insertBreaseEditButton } from './ts/ui/SectionToolbar/SectionEditButton';
+
+// Brease core
 export { 
   Brease,
   getInitializationState, 
@@ -19,8 +16,25 @@ export {
   setBreasePreviewAttribute,
   getBreasePreviewScript,
   getBreasePreviewScriptContent,
-} from './ts/brease';
-export { BreaseSSR } from './ts/brease-ssr';
+} from './brease/brease';
+
+// React UI components
+export { SectionToolbar } from './ui/react/SectionToolbar';
+export { BreaseEditButton } from './ui/react/SectionToolbar/SectionEditButton';
+
+// TypeScript/JS UI components
+export { createSectionToolbar, insertSectionToolbar } from './ui/ts/SectionToolbar';
+export { createBreaseEditButton, insertBreaseEditButton } from './ui/ts/SectionToolbar/SectionEditButton';
+
+// React utilities
+export { printSections } from './utils/react/printSections';
+export { filterSections } from './utils/react/filterSections';
+
+// TypeScript/JS utilities
+export { printSectionsTS } from './utils/ts/printSections';
+export { filterSectionsTS } from './utils/ts/filterSections';
+
+// Types
 export type { 
   BreaseConfig, 
   Page,
@@ -33,6 +47,9 @@ export type {
   BreaseCollectionResponse, 
   BreaseNavigationResponse ,
   BreaseRedirectsResponse,
-  BreaseEntryResponse
-} from './types/types';
-export type { SectionToolbarData } from './ts/ui/SectionToolbar';
+  BreaseEntryResponse,
+  ComponentRenderer,
+  FilteredSection,
+  PrintSectionsOptions
+} from './brease/types';
+export type { SectionToolbarData } from './ui/ts/SectionToolbar';

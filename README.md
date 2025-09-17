@@ -2,6 +2,8 @@
 
 A comprehensive toolkit for integrating Brease CMS with React applications. Build dynamic, content-driven websites with server-side rendering, client-side hydration, and visual editing capabilities.
 
+**🔒 SSR-First Design**: Brease is designed for **server-side rendering** with secure token handling. Client-side access via API routes is available for edge cases.
+
 ## Installation
 
 ```bash
@@ -20,32 +22,70 @@ pnpm add @designatives/brease-tools
 - 📱 **Component Mapping** - Map CMS sections to your React components
 - 🛡️ **TypeScript Support** - Full type safety with comprehensive type definitions
 - ⚡ **Performance Optimized** - Efficient data fetching and caching strategies
+- 🔒 **Secure by Design** - Server-only API access keeps tokens safe
+
+---
+
+# Quick Start
+
+```typescript
+// 1. Create a Brease instance (server-side only)
+import { Brease } from "@designatives/brease-tools";
+
+const brease = new Brease({
+  token: process.env.BREASE_API_TOKEN!,
+  environment: process.env.BREASE_ENV_ID!,
+});
+
+// 2. Fetch data
+const page = await brease.getPageBySlug("/about");
+const navigation = await brease.getNavigation("nav-123");
+
+// 3. Render with React
+import { printSections } from "@designatives/brease-tools";
+
+const sections = printSections(page, componentMap);
+```
 
 ---
 
 # Usage
 
-## 1. Next.js with Server-Side Rendering (Recommended)
+**Primary Use Case**: Server-Side Rendering (SSR) is the recommended approach for optimal performance and security.
+
+**Edge Case**: Client-side usage via API routes is available when SSR isn't possible.
+
+## Server-Side Rendering (Recommended)
 
 ### Basic Setup
 
-First, create your Brease configuration:
+Create a reusable Brease instance for server-side usage:
 
 ```typescript
-// lib/brease/config.ts
-export const breaseConfig = {
+// lib/brease/client.ts
+import { Brease } from "@designatives/brease-tools";
+
+// Create once, reuse everywhere for better performance
+export const brease = new Brease({
   token: process.env.BREASE_API_TOKEN!,
-  environment: process.env.BREASE_ENV_ID!,
-};
+  environment:
+    process.env.NODE_ENV === "production"
+      ? process.env.BREASE_ENV_PROD!
+      : process.env.BREASE_ENV_DEV!,
+});
 ```
+
+**Important**: All examples below import this shared instance instead of creating new ones.
 
 ### Environment Variables
 
 Add these to your `.env.local`:
 
 ```bash
+# Required
 BREASE_API_TOKEN=your_api_token_here
-BREASE_ENV_ID=your_environment_id_here
+BREASE_ENV_DEV=your_dev_environment_id
+BREASE_ENV_PROD=your_prod_environment_id
 ```
 
 ### Root Layout
@@ -80,25 +120,25 @@ Configure redirects and other build-time features using Brease data:
 // next.config.js
 /** @type {import('next').NextConfig} */
 
-const { getRedirects, init } = require("@designatives/brease-tools");
-const path = require("path");
+const { Brease } = require("@designatives/brease-tools");
+
+// Reuse the same instance from lib/brease/client.js
+const { brease } = require("./lib/brease/client");
 
 async function fetchRedirects() {
-  init({
-    token: process.env.BREASE_API_TOKEN,
-    environment: process.env.BREASE_ENV_ID,
-  });
+  try {
+    const data = await brease.getRedirects();
+    if (data.length === 0) return [];
 
-  const data = await getRedirects();
-  if (data.length === 0) return [];
-
-  return data.map((r) => {
-    return {
+    return data.map((r) => ({
       source: r.source,
       destination: r.destination,
-      permanent: r.type === 301 ? true : false,
-    };
-  });
+      permanent: r.type === 301,
+    }));
+  } catch (error) {
+    console.error("Failed to fetch redirects:", error);
+    return [];
+  }
 }
 
 const nextConfig = {
@@ -127,31 +167,38 @@ const nextConfig = {
 module.exports = nextConfig;
 ```
 
-### Home Page
+### Home Page (Next.js App Router)
 
 ```typescript
 // app/page.tsx
 import BreaseClientPage from "@/lib/brease/BreaseClientPage";
-import { breaseConfig } from "@/lib/brease/config";
-import { BreaseSSR } from "@designatives/brease-tools";
+import { brease } from "@/lib/brease/client";
+import { notFound } from "next/navigation";
 
 export default async function HomePage() {
-  const [pageData, navData] = await Promise.all([
-    BreaseSSR.getPageBySlug(breaseConfig, "/"),
-    BreaseSSR.getNavigation(breaseConfig, "nav-123abc-..."),
-  ]);
+  try {
+    // Use Promise.all for parallel requests
+    const [pageData, navData] = await Promise.all([
+      brease.getPageBySlug("/"),
+      brease.getNavigation("nav-123abc-..."),
+    ]);
 
-  return <BreaseClientPage page={pageData} navigation={navData} />;
+    if (!pageData) return notFound();
+
+    return <BreaseClientPage page={pageData} navigation={navData} />;
+  } catch (error) {
+    console.error("Failed to load home page:", error);
+    return notFound();
+  }
 }
 ```
 
-### Dynamic Pages
+### Dynamic Pages (Next.js App Router)
 
 ```typescript
 // app/[pageSlug]/page.tsx
 import BreaseClientPage from "@/lib/brease/BreaseClientPage";
-import { breaseConfig } from "@/lib/brease/config";
-import { BreaseSSR } from "@designatives/brease-tools";
+import { brease } from "@/lib/brease/client";
 import { notFound } from "next/navigation";
 
 export default async function DynamicPage({
@@ -161,9 +208,11 @@ export default async function DynamicPage({
 }) {
   try {
     const pathname = `/${params.pageSlug}`;
+
+    // Parallel requests for better performance
     const [pageData, navData] = await Promise.all([
-      BreaseSSR.getPageBySlug(breaseConfig, pathname),
-      BreaseSSR.getNavigation(breaseConfig, "nav-123abc-..."),
+      brease.getPageBySlug(pathname),
+      brease.getNavigation("nav-123abc-..."),
     ]);
 
     if (!pageData) return notFound();
@@ -183,9 +232,9 @@ export default async function DynamicPage({
 }
 ```
 
-### Component Mapping
+### Component Mapping (React)
 
-Create a mapping between your CMS section types and React components:
+Create a typed mapping between your CMS section types and React components:
 
 ```typescript
 // lib/brease/component-map.ts
@@ -196,7 +245,11 @@ import { ContactSection } from "@/components/section/subpage/ContactSection";
 import { TeamSection } from "@/components/section/subpage/TeamSection";
 // ... import all your section components
 
-const componentMap: Record<string, React.ComponentType<any>> = {
+// Keep your component map organized and typed
+const componentMap: Record<
+  string,
+  React.ComponentType<{ data: any; extra?: any }>
+> = {
   // Home page sections
   "main-hero": HeroSection,
   features: FeatureSection,
@@ -309,86 +362,86 @@ export function HeroSection({ data }: { data: any }) {
 }
 ```
 
----
-
-## 2. Legacy Singleton Pattern (Client-Side Only)
-
-For client-side only applications or when you need the singleton pattern:
+### TypeScript/JS SSR (Express.js)
 
 ```typescript
-// app/layout.tsx or middleware.ts
-import { init } from "@designatives/brease-tools";
+// lib/brease/client.ts
+import { Brease } from "@designatives/brease-tools";
 
-// Initialize ONCE for the entire app
-init({
-  token: process.env.BREASE_API_TOKEN,
-  environment: process.env.BREASE_ENV_ID,
+export const brease = new Brease({
+  token: process.env.BREASE_API_TOKEN!,
+  environment:
+    process.env.NODE_ENV === "production"
+      ? process.env.BREASE_ENV_PROD!
+      : process.env.BREASE_ENV_DEV!,
 });
-
-export default function RootLayout({ children }) {
-  return (
-    <html lang="en">
-      <body>{children}</body>
-    </html>
-  );
-}
 ```
 
 ```typescript
-// Any server component
-import { getPageBySlug } from "@designatives/brease-tools";
-
-export default async function HomePage() {
-  // Uses the existing initialized instance
-  const page = await getPageBySlug("/");
-  return <div>{page.name}</div>;
-}
-```
-
-```typescript
-// Any client component
-"use client";
-import { useEffect, useState } from "react";
-import { getPageBySlug } from "@designatives/brease-tools";
-
-export function ClientComponent() {
-  const [page, setPage] = useState(null);
-
-  useEffect(() => {
-    async function load() {
-      const data = await getPageBySlug("/about");
-      setPage(data);
-    }
-    load();
-  }, []);
-
-  return page ? <div>{page.name}</div> : <div>Loading...</div>;
-}
-```
-
----
-
-## 3. Express.js / Node.js Server
-
-```typescript
-// server.js
+// server.ts
 import express from "express";
-import { init, getPageBySlug } from "@designatives/brease-tools";
+import { printSectionsTS, ComponentRenderer } from "@designatives/brease-tools";
+import { brease } from "./lib/brease/client";
 
 const app = express();
 
-// Initialize ONCE for the entire app
-init({
-  token: process.env.BREASE_API_TOKEN,
-  environment: process.env.BREASE_ENV_ID,
-});
+// Component renderers
+const heroRenderer: ComponentRenderer = (data: any) => {
+  const hero = document.createElement("section");
+  hero.className = "hero-section";
+  hero.innerHTML = `
+    <div class="hero-content">
+      <h1>${data.title}</h1>
+      <p>${data.subtitle}</p>
+    </div>
+  `;
+  return hero;
+};
 
-app.get("/api/pages/:slug", async (req, res) => {
+const componentMap = {
+  "hero-section": heroRenderer,
+  // ... other components
+};
+
+// SSR route
+app.get("/:slug?", async (req, res) => {
   try {
-    const page = await getPageBySlug(`/${req.params.slug}`);
-    res.json(page);
+    const slug = req.params.slug ? `/${req.params.slug}` : "/";
+
+    // Parallel requests for better performance
+    const [page, navigation] = await Promise.all([
+      brease.getPageBySlug(slug),
+      brease.getNavigation("nav-123"),
+    ]);
+
+    if (!page) {
+      return res.status(404).send("Page not found");
+    }
+
+    // Render sections server-side
+    const sections = printSectionsTS(page, componentMap, {
+      optionalData: { theme: "dark" },
+      enablePreview: false, // Disable preview in SSR
+    });
+
+    // Convert to HTML strings
+    const sectionsHTML = sections.map((section) => section.outerHTML).join("");
+
+    res.send(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>${page.name}</title>
+          <link rel="stylesheet" href="/styles.css">
+        </head>
+        <body>
+          <main>${sectionsHTML}</main>
+        </body>
+      </html>
+    `);
   } catch (error) {
-    res.status(404).json({ error: "Page not found" });
+    console.error("Error rendering page:", error);
+    res.status(500).send("Internal server error");
   }
 });
 
@@ -397,7 +450,149 @@ app.listen(3000);
 
 ---
 
-## 4. Visual Editing & Studio Integration
+## Client-Side Usage via API Routes (Edge Cases)
+
+**⚠️ Use SSR when possible** - Client-side usage is only recommended for:
+
+- Single Page Applications (SPAs) that can't use SSR
+- Dynamic content that needs client-side updates
+- Interactive features requiring real-time data
+
+For client-side usage, create API routes that use the server-only Brease instance:
+
+### Next.js API Routes
+
+```typescript
+// app/api/brease/page/[slug]/route.ts
+import { NextRequest, NextResponse } from "next/server";
+import { brease } from "@/lib/brease/client";
+
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { slug: string } }
+) {
+  try {
+    const page = await brease.getPageBySlug(`/${params.slug}`);
+
+    if (!page) {
+      return NextResponse.json({ error: "Page not found" }, { status: 404 });
+    }
+
+    return NextResponse.json(page);
+  } catch (error) {
+    console.error("API Error:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
+  }
+}
+```
+
+```typescript
+// app/api/brease/navigation/[id]/route.ts
+import { NextRequest, NextResponse } from "next/server";
+import { brease } from "@/lib/brease/client";
+
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const navigation = await brease.getNavigation(params.id);
+    return NextResponse.json(navigation);
+  } catch (error) {
+    return NextResponse.json(
+      { error: "Navigation not found" },
+      { status: 404 }
+    );
+  }
+}
+```
+
+### Client-Side Usage
+
+```typescript
+// components/ClientPage.tsx
+"use client";
+import { useEffect, useState } from "react";
+
+export function ClientPage({ slug }: { slug: string }) {
+  const [page, setPage] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchPage() {
+      try {
+        const response = await fetch(`/api/brease/page/${slug}`);
+        if (response.ok) {
+          const pageData = await response.json();
+          setPage(pageData);
+        }
+      } catch (error) {
+        console.error("Failed to fetch page:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchPage();
+  }, [slug]);
+
+  if (loading) return <div>Loading...</div>;
+  if (!page) return <div>Page not found</div>;
+
+  return <div>{page.name}</div>;
+}
+```
+
+### Express.js API Routes
+
+```typescript
+// server.js
+import express from "express";
+import { brease } from "./lib/brease/client";
+
+const app = express();
+
+// API route for pages
+app.get("/api/brease/page/:slug", async (req, res) => {
+  try {
+    const page = await brease.getPageBySlug(`/${req.params.slug}`);
+
+    if (!page) {
+      return res.status(404).json({ error: "Page not found" });
+    }
+
+    res.json(page);
+  } catch (error) {
+    console.error("API Error:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// API route for navigation
+app.get("/api/brease/navigation/:id", async (req, res) => {
+  try {
+    const navigation = await brease.getNavigation(req.params.id);
+
+    if (!navigation) {
+      return res.status(404).json({ error: "Navigation not found" });
+    }
+
+    res.json(navigation);
+  } catch (error) {
+    console.error("API Error:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+app.listen(3000);
+```
+
+---
+
+## Visual Editing & Brease Web App Integration
 
 ### Section Toolbar
 
@@ -436,77 +631,52 @@ insertSectionToolbar(document.getElementById("hero-section"), toolbar);
 
 # API Reference
 
-## BreaseSSR Methods
+## Core Brease Instance (`/brease`)
 
-All methods require a config object as the first parameter:
+The main Brease class provides secure, server-only access to the Brease API.
 
-```typescript
-import { BreaseSSR } from "@designatives/brease-tools";
-
-const config = {
-  token: "your-api-token",
-  environment: "your-environment-id",
-};
-
-// Get page by slug
-const page = await BreaseSSR.getPageBySlug(config, "/about", "en");
-
-// Get page by ID
-const page = await BreaseSSR.getPageByID(config, "page-id");
-
-// Get navigation
-const nav = await BreaseSSR.getNavigation(config, "nav-id");
-
-// Get collection
-const collection = await BreaseSSR.getCollection(config, "collection-id");
-
-// Get entry by slug
-const entry = await BreaseSSR.getEntryBySlug(
-  config,
-  "collection-id",
-  "entry-slug",
-  "en"
-);
-
-// Get redirects
-const redirects = await BreaseSSR.getRedirects(config);
-```
-
-## Singleton Methods
+Create a Brease instance for server-side usage:
 
 ```typescript
-import {
-  init,
-  getPageBySlug,
-  getPageByID,
-  getNavigation,
-  getCollection,
-  getEntryBySlug,
-  getRedirects,
-} from "@designatives/brease-tools";
+import { Brease } from "@designatives/brease-tools";
 
-// Initialize once
-await init({
+const brease = new Brease({
   token: "your-api-token",
   environment: "your-environment-id",
 });
 
-// Then use anywhere
-const page = await getPageBySlug("/about");
-const nav = await getNavigation("nav-id");
+// Get page by slug
+const page = await brease.getPageBySlug("/about", "en");
+
+// Get page by ID
+const page = await brease.getPageByID("page-id");
+
+// Get page metadata by slug
+const pageMeta = await brease.getPageMetaBySlug("/about", "en");
+
+// Get navigation
+const nav = await brease.getNavigation("nav-id");
+
+// Get collection
+const collection = await brease.getCollection("collection-id");
+
+// Get entry by slug
+const entry = await brease.getEntryBySlug("collection-id", "entry-slug", "en");
+
+// Get entry by ID
+const entry = await brease.getEntryByID("collection-id", "entry-id", "en");
+
+// Get redirects
+const redirects = await brease.getRedirects();
 ```
 
-## React Components
+## React Components (`/ui/react`)
 
 ```typescript
 import {
-  printSections,
   SectionToolbar,
   BreaseEditButton
 } from '@designatives/brease-tools';
-
-// Render page sections
-const sections = printSections(page, componentMap);
 
 // Section toolbar for editing
 <SectionToolbar data={sectionData} />
@@ -515,7 +685,169 @@ const sections = printSections(page, componentMap);
 <BreaseEditButton id="section-uuid" />
 ```
 
-## TypeScript Types
+## TypeScript/JS Components (`/ui/ts`)
+
+```typescript
+import {
+  createSectionToolbar,
+  insertSectionToolbar,
+  createBreaseEditButton,
+  insertBreaseEditButton,
+} from "@designatives/brease-tools";
+
+// Create and insert section toolbar
+const toolbar = createSectionToolbar(sectionData);
+insertSectionToolbar(container, toolbar);
+
+// Create and insert edit button
+const button = createBreaseEditButton({ id: "section-uuid" });
+insertBreaseEditButton(container, button);
+```
+
+## React Utilities (`/utils/react`)
+
+```typescript
+import { printSections, filterSections } from "@designatives/brease-tools";
+
+// Render page sections
+const sections = printSections(page, componentMap);
+
+// Filter sections by component map
+const filteredSections = filterSections(page, componentMap);
+```
+
+## TypeScript/JS Utilities (`/utils/ts`)
+
+```typescript
+import {
+  printSectionsTS,
+  filterSectionsTS,
+  type ComponentRenderer,
+  type PrintSectionsOptions,
+} from "@designatives/brease-tools";
+
+// Define component renderer function
+const heroRenderer: ComponentRenderer = (data, extra) => {
+  const hero = document.createElement("section");
+  hero.className = "hero-section";
+  hero.innerHTML = `
+    <h1>${data.title}</h1>
+    <p>${data.subtitle}</p>
+  `;
+  return hero;
+};
+
+// Component map for TS/JS
+const componentMap = {
+  "hero-section": heroRenderer,
+  "feature-section": featureRenderer,
+  // ... other components
+};
+
+// Render sections to DOM
+const sections = printSectionsTS(page, componentMap, {
+  container: document.getElementById("content"),
+  optionalData: { theme: "dark" },
+  enablePreview: true,
+});
+
+// Filter sections
+const filteredSections = filterSectionsTS(page, componentMap);
+```
+
+### Complete Example
+
+Here's a complete example showing how to use the TypeScript/JS utilities:
+
+```typescript
+import { Brease } from "@designatives/brease-tools";
+import {
+  printSectionsTS,
+  filterSectionsTS,
+  type ComponentRenderer,
+} from "@designatives/brease-tools";
+
+// Define component renderers
+const heroRenderer: ComponentRenderer = (data: any, extra?: any) => {
+  const hero = document.createElement("section");
+  hero.className = "hero-section";
+  hero.innerHTML = `
+    <div class="hero-content">
+      <h1>${data.title}</h1>
+      <p>${data.subtitle}</p>
+      ${
+        data.buttonText
+          ? `<button class="cta-button">${data.buttonText}</button>`
+          : ""
+      }
+    </div>
+  `;
+  return hero;
+};
+
+const featureRenderer: ComponentRenderer = (data: any, extra?: any) => {
+  const features = document.createElement("section");
+  features.className = "features-section";
+
+  const featuresHTML = data.features
+    .map(
+      (feature: any) => `
+    <div class="feature-item">
+      <h3>${feature.title}</h3>
+      <p>${feature.description}</p>
+    </div>
+  `
+    )
+    .join("");
+
+  features.innerHTML = `
+    <div class="features-container">
+      <h2>${data.sectionTitle}</h2>
+      <div class="features-grid">
+        ${featuresHTML}
+      </div>
+    </div>
+  `;
+
+  return features;
+};
+
+// Component map
+const componentMap = {
+  "hero-section": heroRenderer,
+  "features-section": featureRenderer,
+};
+
+// Example usage function
+export async function renderPageExample() {
+  try {
+    // Import the shared Brease instance
+    const { brease } = await import("./lib/brease/client");
+
+    // Fetch page data
+    const page = await brease.getPageBySlug("/example");
+
+    if (!page) {
+      throw new Error("Page not found");
+    }
+
+    // Render sections to DOM
+    const container = document.getElementById("page-content");
+    const sections = printSectionsTS(page, componentMap, {
+      container: container || undefined,
+      optionalData: { theme: "dark" },
+      enablePreview: true,
+    });
+
+    return sections;
+  } catch (error) {
+    console.error("Error rendering page:", error);
+    throw error;
+  }
+}
+```
+
+## TypeScript Types (`/brease/types`)
 
 ```typescript
 import type {
@@ -526,66 +858,13 @@ import type {
   Navigation,
   Entry,
   Redirect,
+  BreasePageResponse,
+  BreaseCollectionResponse,
+  BreaseNavigationResponse,
+  BreaseRedirectsResponse,
+  BreaseEntryResponse,
+  SectionToolbarData,
 } from "@designatives/brease-tools";
-```
-
----
-
-# Best Practices
-
-## 1. Error Handling
-
-Always wrap your Brease calls in try-catch blocks:
-
-```typescript
-export default async function Page({ params }) {
-  try {
-    const page = await BreaseSSR.getPageBySlug(config, `/${params.slug}`);
-    if (!page) return notFound();
-    return <YourPageComponent page={page} />;
-  } catch (error) {
-    console.error("Failed to load page:", error);
-    return notFound();
-  }
-}
-```
-
-## 2. Performance Optimization
-
-Use Promise.all for parallel requests:
-
-```typescript
-const [pageData, navData, footerData] = await Promise.all([
-  BreaseSSR.getPageBySlug(config, pathname),
-  BreaseSSR.getNavigation(config, "header-nav"),
-  BreaseSSR.getNavigation(config, "footer-nav"),
-]);
-```
-
-## 3. Component Mapping
-
-Keep your component map organized and typed:
-
-```typescript
-const componentMap: Record<string, React.ComponentType<{ data: any }>> = {
-  "hero-section": HeroSection,
-  "feature-grid": FeatureGrid,
-  "contact-form": ContactForm,
-};
-```
-
-## 4. Environment Management
-
-Use different configurations for different environments:
-
-```typescript
-const breaseConfig = {
-  token: process.env.BREASE_API_TOKEN!,
-  environment:
-    process.env.NODE_ENV === "production"
-      ? process.env.BREASE_ENV_PROD!
-      : process.env.BREASE_ENV_DEV!,
-};
 ```
 
 ---
@@ -594,10 +873,10 @@ const breaseConfig = {
 
 ## Common Issues
 
-### "Brease is not initialized" Error
+### "Brease instance can only be created in server environments" Error
 
-- **Solution**: Use `BreaseSSR` instead of singleton methods for SSR (if supperted by the framework)
-- **Alternative**: Ensure `init()` is called before any other methods
+- **Solution**: Create Brease instances only in server-side code (API routes, server components, etc.)
+- **For client-side**: Use API routes that call the Brease instance server-side
 
 ### TypeScript Errors
 
@@ -616,12 +895,6 @@ import type { Page, Navigation } from "@designatives/brease-tools";
 
 - **Solution**: Use parallel requests with `Promise.all`
 - **Solution**: Implement proper error boundaries
-
----
-
-# Contributing
-
-We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
 
 ---
 

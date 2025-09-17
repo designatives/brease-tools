@@ -1,5 +1,5 @@
-import React, { ReactNode } from 'react';
 import * as react_jsx_runtime from 'react/jsx-runtime';
+import React, { ReactNode } from 'react';
 
 interface BreaseConfig {
     token: string;
@@ -78,31 +78,21 @@ interface BreaseRedirectsResponse extends Response {
     };
     message: string | null;
 }
-
-declare function printSections(page: Page, componentMap: Record<string, React.ComponentType<any>>, optionalData?: any): ReactNode[];
-
-declare function SectionToolbar({ data }: {
-    data: any;
-}): react_jsx_runtime.JSX.Element;
-
-interface BreaseEditButtonProps$1 {
-    id: string;
+interface ComponentRenderer {
+    (data: any, extra?: any): HTMLElement;
 }
-declare const BreaseEditButton: ({ id }: BreaseEditButtonProps$1) => react_jsx_runtime.JSX.Element;
-
-interface SectionToolbarData {
+interface FilteredSection {
+    component: ComponentRenderer;
+    page_section_uuid: string;
+    section_uuid: string;
     name: string;
-    uuid: string;
-    [key: string]: any;
+    data: any;
 }
-declare function createSectionToolbar(data: SectionToolbarData): HTMLDivElement;
-declare function insertSectionToolbar(parent: HTMLElement, data: SectionToolbarData): HTMLDivElement;
-
-interface BreaseEditButtonProps {
-    id: string;
+interface PrintSectionsOptions {
+    container?: HTMLElement;
+    optionalData?: any;
+    enablePreview?: boolean;
 }
-declare function createBreaseEditButton({ id }: BreaseEditButtonProps): HTMLButtonElement;
-declare function insertBreaseEditButton(container: HTMLElement, id: string): HTMLButtonElement;
 
 type InitializationState = {
     status: 'uninitialized' | 'initializing' | 'initialized' | 'error';
@@ -113,15 +103,13 @@ declare class Brease {
     private readonly token;
     private readonly apiUrl;
     private readonly baseEnvironment;
-    private readonly baseProxyUrl;
-    protected constructor(breaseConfig: BreaseConfig);
+    constructor(breaseConfig: BreaseConfig);
     /**
      * Create a new Brease instance.
      * This is used by framework-specific implementations.
      */
     static createInstance(config: BreaseConfig): Brease;
-    private fetchServerData;
-    private fetchClientData;
+    private fetchData;
     getPageByID(pageId: string): Promise<Page>;
     getPageBySlug(pageSlug: string, locale?: string): Promise<Page>;
     getPageMetaBySlug(pageSlug: string, locale?: string): Promise<Page>;
@@ -156,45 +144,41 @@ declare function setBreasePreviewAttribute(): void;
 declare function getBreasePreviewScript(): string;
 declare function getBreasePreviewScriptContent(): string;
 
-/**
- * SSR-safe Brease utilities that don't rely on global state.
- * Each method creates its own client instance, making it safe for server-side rendering
- * where global state might not persist between requests.
- */
-declare class BreaseSSR {
-    private static createClient;
-    /**
-     * Get a page by its slug in SSR context
-     */
-    static getPageBySlug(config: BreaseConfig, pageSlug: string, locale?: string): Promise<Page>;
-    /**
-     * Get a page metadata by its slug in SSR context
-     */
-    static getPageMetaBySlug(config: BreaseConfig, pageSlug: string, locale?: string): Promise<Page>;
-    /**
-     * Get a page by its ID in SSR context
-     */
-    static getPageByID(config: BreaseConfig, pageId: string): Promise<Page>;
-    /**
-     * Get navigation data in SSR context
-     */
-    static getNavigation(config: BreaseConfig, navigationId: string): Promise<Navigation>;
-    /**
-     * Get collection data in SSR context
-     */
-    static getCollection(config: BreaseConfig, collectionId: string): Promise<Collection>;
-    /**
-     * Get an entry by its slug in SSR context
-     */
-    static getEntryBySlug(config: BreaseConfig, collectionId: string, entrySlug: string, locale?: string): Promise<Entry>;
-    /**
-     * Get an entry by its ID in SSR context
-     */
-    static getEntryByID(config: BreaseConfig, collectionId: string, entryId: string, locale?: string): Promise<Entry>;
-    /**
-     * Get redirects data in SSR context
-     */
-    static getRedirects(config: BreaseConfig): Promise<Redirect[]>;
-}
+declare function SectionToolbar({ data }: {
+    data: any;
+}): react_jsx_runtime.JSX.Element;
 
-export { Brease, type BreaseCollectionResponse, type BreaseConfig, BreaseEditButton, type BreaseEntryResponse, type BreaseNavigationResponse, type BreasePageResponse, type BreaseRedirectsResponse, BreaseSSR, type Collection, type Entry, type Navigation, type Page, type PageSection, type Redirect, SectionToolbar, type SectionToolbarData, createBreaseEditButton, createSectionToolbar, getBreasePreviewScript, getBreasePreviewScriptContent, getCollection, getEntryByID, getEntryBySlug, getInitializationState, getInstance, getNavigation, getPageByID, getPageBySlug, getRedirects, init, insertBreaseEditButton, insertSectionToolbar, printSections, setBreasePreviewAttribute };
+interface BreaseEditButtonProps$1 {
+    id: string;
+}
+declare const BreaseEditButton: ({ id }: BreaseEditButtonProps$1) => react_jsx_runtime.JSX.Element;
+
+interface SectionToolbarData {
+    name: string;
+    uuid: string;
+    [key: string]: any;
+}
+declare function createSectionToolbar(data: SectionToolbarData): HTMLDivElement;
+declare function insertSectionToolbar(parent: HTMLElement, data: SectionToolbarData): HTMLDivElement;
+
+interface BreaseEditButtonProps {
+    id: string;
+}
+declare function createBreaseEditButton({ id }: BreaseEditButtonProps): HTMLButtonElement;
+declare function insertBreaseEditButton(container: HTMLElement, id: string): HTMLButtonElement;
+
+declare function printSections(page: Page, componentMap: Record<string, React.ComponentType<any>>, optionalData?: any): ReactNode[];
+
+declare function filterSections(page: Page, componentMap: Record<string, React.ComponentType<any>>): ({
+    component: React.ComponentType<any>;
+    page_section_uuid: string;
+    section_uuid: string;
+    name: string;
+    data: any;
+} | null)[];
+
+declare function printSectionsTS(page: Page, componentMap: Record<string, ComponentRenderer>, options?: PrintSectionsOptions): HTMLElement[];
+
+declare function filterSectionsTS(page: Page, componentMap: Record<string, ComponentRenderer>): (FilteredSection | null)[];
+
+export { Brease, type BreaseCollectionResponse, type BreaseConfig, BreaseEditButton, type BreaseEntryResponse, type BreaseNavigationResponse, type BreasePageResponse, type BreaseRedirectsResponse, type Collection, type ComponentRenderer, type Entry, type FilteredSection, type Navigation, type Page, type PageSection, type PrintSectionsOptions, type Redirect, SectionToolbar, type SectionToolbarData, createBreaseEditButton, createSectionToolbar, filterSections, filterSectionsTS, getBreasePreviewScript, getBreasePreviewScriptContent, getCollection, getEntryByID, getEntryBySlug, getInitializationState, getInstance, getNavigation, getPageByID, getPageBySlug, getRedirects, init, insertBreaseEditButton, insertSectionToolbar, printSections, printSectionsTS, setBreasePreviewAttribute };

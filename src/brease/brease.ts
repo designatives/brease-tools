@@ -1,4 +1,4 @@
-import { BreaseConfig, Page, BreasePageResponse, Collection, BreaseCollectionResponse, Navigation, BreaseNavigationResponse, BreaseEntryResponse, Entry, BreaseRedirectsResponse, Redirect } from "../types/types"
+import { BreaseConfig, Page, BreasePageResponse, Collection, BreaseCollectionResponse, Navigation, BreaseNavigationResponse, BreaseEntryResponse, Entry, BreaseRedirectsResponse, Redirect } from "./types"
 
 type InitializationState = {
   status: 'uninitialized' | 'initializing' | 'initialized' | 'error';
@@ -15,13 +15,11 @@ export class Brease {
   private readonly token: string;
   private readonly apiUrl: string;
   private readonly baseEnvironment: string;
-  private readonly baseProxyUrl: string;
 
-  protected constructor(breaseConfig: BreaseConfig) {
+  constructor(breaseConfig: BreaseConfig) {
     this.token = breaseConfig.token;
     this.apiUrl = breaseConfig?.apiUrl || 'https://api.brease.io/v1';
     this.baseEnvironment = breaseConfig.environment;
-    this.baseProxyUrl = breaseConfig?.proxyUrl || '/api/brease';
   }
 
   /**
@@ -32,8 +30,8 @@ export class Brease {
     return new Brease(config);
   }
 
-  // Server-side: Direct API call with token
-  private async fetchServerData(url: string): Promise<any> {
+  // Direct API call with token (server-only)
+  private async fetchData(url: string): Promise<any> {
     const response = await fetch(this.apiUrl + url, {
       method: 'GET',
       headers: {
@@ -41,37 +39,21 @@ export class Brease {
         Authorization: `Bearer ${this.token}`
       },
     });
-    
     if (!response.ok) {
       throw new Error(`API request failed: ${response.statusText}`);
-    }
-    
-    return await response.json();
-  }
-
-  // Client-side: Call the proxy endpoint
-  private async fetchClientData(endpoint: string): Promise<any> {
-    const response = await fetch(`${this.baseProxyUrl}/${endpoint}`);
-    if (!response.ok) {
-      throw new Error(`Failed to fetch ${endpoint}: ${response.statusText}`);
     }
     return await response.json();
   }
 
   async getPageByID(pageId: string): Promise<Page> {
-    const isServer = typeof window === 'undefined';
     const endpoint = `/environments/${this.baseEnvironment}/pages/${pageId}`;
     
     try {
-      if (isServer) {
-        const response = (await this.fetchServerData(endpoint)) as BreasePageResponse;
-        if (response.message) {
-          throw new Error(response.message);
-        }
-        return response.data.page;
-      } else {
-        return await this.fetchClientData(endpoint);
+      const response = (await this.fetchData(endpoint)) as BreasePageResponse;
+      if (response.message) {
+        throw new Error(response.message);
       }
+      return response.data.page;
     } catch (error: unknown) {
       if (error instanceof Error) {
         throw new Error(`Failed to fetch page: ${error.message}`);
@@ -81,19 +63,14 @@ export class Brease {
   }
 
   async getPageBySlug(pageSlug: string, locale?: string): Promise<Page> {
-    const isServer = typeof window === 'undefined';
     const endpoint = `/environments/${this.baseEnvironment}/page?locale=${locale||'en'}&slug=${pageSlug}`;
     
     try {
-      if (isServer) {
-        const response = (await this.fetchServerData(endpoint)) as BreasePageResponse;
-        if (response.message) {
-          throw new Error(response.message);
-        }
-        return response.data.page;
-      } else {
-        return await this.fetchClientData(endpoint);
+      const response = (await this.fetchData(endpoint)) as BreasePageResponse;
+      if (response.message) {
+        throw new Error(response.message);
       }
+      return response.data.page;
     } catch (error: unknown) {
       if (error instanceof Error) {
         throw new Error(`Failed to fetch page: ${error.message}`);
@@ -103,41 +80,31 @@ export class Brease {
   }
 
   async getPageMetaBySlug(pageSlug: string, locale?: string): Promise<Page> {
-    const isServer = typeof window === 'undefined';
     const endpoint = `/environments/${this.baseEnvironment}/page?locale=${locale||'en'}&slug=${pageSlug}&metaOnly=1`;
     
     try {
-      if (isServer) {
-        const response = (await this.fetchServerData(endpoint)) as BreasePageResponse;
-        if (response.message) {
-          throw new Error(response.message);
-        }
-        return response.data.page;
-      } else {
-        return await this.fetchClientData(endpoint);
+      const response = (await this.fetchData(endpoint)) as BreasePageResponse;
+      if (response.message) {
+        throw new Error(response.message);
       }
+      return response.data.page;
     } catch (error: unknown) {
       if (error instanceof Error) {
         throw new Error(`Failed to fetch page metadata: ${error.message}`);
       }
-      throw new Error('Failed to fetch pag metadata: Unknown error');
+      throw new Error('Failed to fetch page metadata: Unknown error');
     }
   }
 
   async getCollection(collectionId: string): Promise<Collection> {
-    const isServer = typeof window === 'undefined';
     const endpoint = `/environments/${this.baseEnvironment}/collections/${collectionId}`;
     
     try {
-      if (isServer) {
-        const response = (await this.fetchServerData(endpoint)) as BreaseCollectionResponse;
-        if (response.message) {
-          throw new Error(response.message);
-        }
-        return response.data.collection;
-      } else {
-        return await this.fetchClientData(endpoint);
+      const response = (await this.fetchData(endpoint)) as BreaseCollectionResponse;
+      if (response.message) {
+        throw new Error(response.message);
       }
+      return response.data.collection;
     } catch (error: unknown) {
       if (error instanceof Error) {
         throw new Error(`Failed to fetch collection: ${error.message}`);
@@ -147,63 +114,48 @@ export class Brease {
   }
 
   async getEntryBySlug(collectionId: string, entrySlug:string, locale?: string): Promise<Entry> {
-    const isServer = typeof window === 'undefined';
     const endpoint = `/environments/${this.baseEnvironment}/collections/${collectionId}/entry?locale=${locale || 'en'}&slug=${entrySlug}`;
     
     try {
-      if (isServer) {
-        const response = (await this.fetchServerData(endpoint)) as BreaseEntryResponse;
-        if (response.message) {
-          throw new Error(response.message);
-        }
-        return response.data.entry;
-      } else {
-        return await this.fetchClientData(endpoint);
+      const response = (await this.fetchData(endpoint)) as BreaseEntryResponse;
+      if (response.message) {
+        throw new Error(response.message);
       }
+      return response.data.entry;
     } catch (error: unknown) {
       if (error instanceof Error) {
         throw new Error(`Failed to fetch entry: ${error.message}`);
       }
-      throw new Error('Failed to fetch collection: Unknown error');
+      throw new Error('Failed to fetch entry: Unknown error');
     }
   }
 
   async getEntryByID(collectionId: string, entryId:string, locale?: string): Promise<Entry> {
-    const isServer = typeof window === 'undefined';
     const endpoint = `/environments/${this.baseEnvironment}/collections/${collectionId}/entry/${entryId}?locale=${locale || 'en'}`;
     
     try {
-      if (isServer) {
-        const response = (await this.fetchServerData(endpoint)) as BreaseEntryResponse;
-        if (response.message) {
-          throw new Error(response.message);
-        }
-        return response.data.entry;
-      } else {
-        return await this.fetchClientData(endpoint);
+      const response = (await this.fetchData(endpoint)) as BreaseEntryResponse;
+      if (response.message) {
+        throw new Error(response.message);
       }
+      return response.data.entry;
     } catch (error: unknown) {
       if (error instanceof Error) {
         throw new Error(`Failed to fetch entry: ${error.message}`);
       }
-      throw new Error('Failed to fetch collection: Unknown error');
+      throw new Error('Failed to fetch entry: Unknown error');
     }
   }
 
   async getNavigation(navigationId: string): Promise<Navigation> {
-    const isServer = typeof window === 'undefined';
     const endpoint = `/environments/${this.baseEnvironment}/navigations/${navigationId}`;
     
     try {
-      if (isServer) {
-        const response = (await this.fetchServerData(endpoint)) as BreaseNavigationResponse;
-        if (response.message) {
-          throw new Error(response.message);
-        }
-        return response.data.navigation;
-      } else {
-        return await this.fetchClientData(endpoint);
+      const response = (await this.fetchData(endpoint)) as BreaseNavigationResponse;
+      if (response.message) {
+        throw new Error(response.message);
       }
+      return response.data.navigation;
     } catch (error: unknown) {
       if (error instanceof Error) {
         throw new Error(`Failed to fetch navigation: ${error.message}`);
@@ -213,19 +165,14 @@ export class Brease {
   }
 
   async getRedirects(): Promise<Redirect[]> {
-    const isServer = typeof window === 'undefined';
     const endpoint = `/environments/${this.baseEnvironment}/redirects`;
     
     try {
-      if (isServer) {
-        const response = (await this.fetchServerData(endpoint)) as BreaseRedirectsResponse;
-        if (response.message) {
-          throw new Error(response.message);
-        }
-        return response.data.redirects;
-      } else {
-        return await this.fetchClientData(endpoint);
+      const response = (await this.fetchData(endpoint)) as BreaseRedirectsResponse;
+      if (response.message) {
+        throw new Error(response.message);
       }
+      return response.data.redirects;
     } catch (error: unknown) {
       if (error instanceof Error) {
         throw new Error(`Failed to fetch redirects: ${error.message}`);

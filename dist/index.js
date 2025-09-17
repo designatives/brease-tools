@@ -32,10 +32,11 @@ var index_exports = {};
 __export(index_exports, {
   Brease: () => Brease,
   BreaseEditButton: () => BreaseEditButton,
-  BreaseSSR: () => BreaseSSR,
   SectionToolbar: () => SectionToolbar,
   createBreaseEditButton: () => createBreaseEditButton,
   createSectionToolbar: () => createSectionToolbar,
+  filterSections: () => filterSections,
+  filterSectionsTS: () => filterSectionsTS,
   getBreasePreviewScript: () => getBreasePreviewScript,
   getBreasePreviewScriptContent: () => getBreasePreviewScriptContent,
   getCollection: () => getCollection,
@@ -51,171 +52,12 @@ __export(index_exports, {
   insertBreaseEditButton: () => insertBreaseEditButton,
   insertSectionToolbar: () => insertSectionToolbar,
   printSections: () => printSections,
+  printSectionsTS: () => printSectionsTS,
   setBreasePreviewAttribute: () => setBreasePreviewAttribute
 });
 module.exports = __toCommonJS(index_exports);
 
-// src/react/printSections.ts
-var import_react2 = __toESM(require("react"));
-
-// src/react/ui/SectionToolbar/SectionEditButton/index.tsx
-var import_react = __toESM(require("react"));
-var import_jsx_runtime = require("react/jsx-runtime");
-function BreaseAction(action, data) {
-  if (typeof window !== "undefined" && window.parent) {
-    window.parent.postMessage(
-      {
-        action,
-        data: {
-          ...data,
-          scrollY: window.scrollY
-        }
-      },
-      "*"
-    );
-  }
-}
-var BreaseEditButton = ({ id }) => {
-  const buttonRef = import_react.default.useRef(null);
-  import_react.default.useEffect(() => {
-    const handleClick = () => {
-      BreaseAction("BreaseEditSection", { uuid: id });
-    };
-    const button = buttonRef.current;
-    if (button) {
-      button.addEventListener("click", handleClick);
-    }
-    return () => {
-      if (button) {
-        button.removeEventListener("click", handleClick);
-      }
-    };
-  }, [id]);
-  return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
-    "button",
-    {
-      ref: buttonRef,
-      className: "brease-edit-button",
-      children: "Edit"
-    }
-  );
-};
-
-// src/react/ui/SectionToolbar/index.tsx
-var import_jsx_runtime2 = require("react/jsx-runtime");
-function SectionToolbar({ data }) {
-  return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "brease-section-toolbar", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "brease-section-title", children: data.name }) }),
-    /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "brease-toolbar-actions", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(BreaseEditButton, { id: data.page_section_uuid }) })
-  ] });
-}
-
-// src/react/filterSections.ts
-function filterSections(page, componentMap) {
-  return page.sections.map((section) => {
-    if (componentMap[section.type]) {
-      return {
-        component: componentMap[section.type],
-        page_section_uuid: section.page_section_uuid,
-        section_uuid: section.uuid,
-        name: section.name,
-        data: section.elements
-      };
-    }
-    return null;
-  });
-}
-
-// src/react/printSections.ts
-function printSections(page, componentMap, optionalData) {
-  const sections = filterSections(page, componentMap);
-  const isInIframe = typeof window !== "undefined" && window.self !== window.top;
-  return sections?.map((section, index) => {
-    if (section) {
-      if (isInIframe) {
-        return import_react2.default.createElement(
-          "figure",
-          {
-            key: index,
-            id: section.page_section_uuid,
-            className: "brease-section"
-          },
-          import_react2.default.createElement(SectionToolbar, { data: section }),
-          // Add overlays to disable interactivity
-          import_react2.default.createElement("div", {
-            className: "brease-preview-overlay"
-          }),
-          import_react2.default.createElement(section.component, { data: section.data, extra: optionalData || null })
-        );
-      } else {
-        return import_react2.default.createElement(
-          "figure",
-          {
-            key: index,
-            id: section.page_section_uuid,
-            className: "brease-section"
-          },
-          import_react2.default.createElement(section.component, { data: section.data, extra: optionalData || null })
-        );
-      }
-    }
-  });
-}
-
-// src/ts/ui/SectionToolbar/SectionEditButton/index.ts
-function BreaseAction2(action, data) {
-  if (typeof window !== "undefined" && window.parent) {
-    window.parent.postMessage(
-      {
-        action,
-        data: {
-          ...data,
-          scrollY: window.scrollY
-        }
-      },
-      "*"
-    );
-  }
-}
-function createBreaseEditButton({ id }) {
-  const button = document.createElement("button");
-  button.textContent = "Edit";
-  button.className = "brease-edit-button";
-  button.addEventListener("click", () => {
-    BreaseAction2("BreaseEditSection", { uuid: id });
-  });
-  return button;
-}
-function insertBreaseEditButton(container, id) {
-  const button = createBreaseEditButton({ id });
-  container.appendChild(button);
-  return button;
-}
-
-// src/ts/ui/SectionToolbar/index.ts
-function createSectionToolbar(data) {
-  const container = document.createElement("div");
-  container.className = "brease-section-toolbar";
-  const titleContainer = document.createElement("div");
-  const title = document.createElement("span");
-  title.className = "brease-section-title";
-  title.textContent = data.name;
-  titleContainer.appendChild(title);
-  const actionsContainer = document.createElement("div");
-  actionsContainer.className = "brease-toolbar-actions";
-  const editButton = createBreaseEditButton({ id: data.page_section_uuid });
-  actionsContainer.appendChild(editButton);
-  container.appendChild(titleContainer);
-  container.appendChild(actionsContainer);
-  return container;
-}
-function insertSectionToolbar(parent, data) {
-  const toolbar = createSectionToolbar(data);
-  parent.appendChild(toolbar);
-  return toolbar;
-}
-
-// src/ts/brease.ts
+// src/brease/brease.ts
 var initializationState = {
   status: "uninitialized"
 };
@@ -224,7 +66,6 @@ var Brease = class _Brease {
     this.token = breaseConfig.token;
     this.apiUrl = breaseConfig?.apiUrl || "https://api.brease.io/v1";
     this.baseEnvironment = breaseConfig.environment;
-    this.baseProxyUrl = breaseConfig?.proxyUrl || "/api/brease";
   }
   /**
    * Create a new Brease instance.
@@ -233,8 +74,8 @@ var Brease = class _Brease {
   static createInstance(config) {
     return new _Brease(config);
   }
-  // Server-side: Direct API call with token
-  async fetchServerData(url) {
+  // Direct API call with token (server-only)
+  async fetchData(url) {
     const response = await fetch(this.apiUrl + url, {
       method: "GET",
       headers: {
@@ -247,27 +88,14 @@ var Brease = class _Brease {
     }
     return await response.json();
   }
-  // Client-side: Call the proxy endpoint
-  async fetchClientData(endpoint) {
-    const response = await fetch(`${this.baseProxyUrl}/${endpoint}`);
-    if (!response.ok) {
-      throw new Error(`Failed to fetch ${endpoint}: ${response.statusText}`);
-    }
-    return await response.json();
-  }
   async getPageByID(pageId) {
-    const isServer = typeof window === "undefined";
     const endpoint = `/environments/${this.baseEnvironment}/pages/${pageId}`;
     try {
-      if (isServer) {
-        const response = await this.fetchServerData(endpoint);
-        if (response.message) {
-          throw new Error(response.message);
-        }
-        return response.data.page;
-      } else {
-        return await this.fetchClientData(endpoint);
+      const response = await this.fetchData(endpoint);
+      if (response.message) {
+        throw new Error(response.message);
       }
+      return response.data.page;
     } catch (error) {
       if (error instanceof Error) {
         throw new Error(`Failed to fetch page: ${error.message}`);
@@ -276,18 +104,13 @@ var Brease = class _Brease {
     }
   }
   async getPageBySlug(pageSlug, locale) {
-    const isServer = typeof window === "undefined";
     const endpoint = `/environments/${this.baseEnvironment}/page?locale=${locale || "en"}&slug=${pageSlug}`;
     try {
-      if (isServer) {
-        const response = await this.fetchServerData(endpoint);
-        if (response.message) {
-          throw new Error(response.message);
-        }
-        return response.data.page;
-      } else {
-        return await this.fetchClientData(endpoint);
+      const response = await this.fetchData(endpoint);
+      if (response.message) {
+        throw new Error(response.message);
       }
+      return response.data.page;
     } catch (error) {
       if (error instanceof Error) {
         throw new Error(`Failed to fetch page: ${error.message}`);
@@ -296,38 +119,28 @@ var Brease = class _Brease {
     }
   }
   async getPageMetaBySlug(pageSlug, locale) {
-    const isServer = typeof window === "undefined";
     const endpoint = `/environments/${this.baseEnvironment}/page?locale=${locale || "en"}&slug=${pageSlug}&metaOnly=1`;
     try {
-      if (isServer) {
-        const response = await this.fetchServerData(endpoint);
-        if (response.message) {
-          throw new Error(response.message);
-        }
-        return response.data.page;
-      } else {
-        return await this.fetchClientData(endpoint);
+      const response = await this.fetchData(endpoint);
+      if (response.message) {
+        throw new Error(response.message);
       }
+      return response.data.page;
     } catch (error) {
       if (error instanceof Error) {
         throw new Error(`Failed to fetch page metadata: ${error.message}`);
       }
-      throw new Error("Failed to fetch pag metadata: Unknown error");
+      throw new Error("Failed to fetch page metadata: Unknown error");
     }
   }
   async getCollection(collectionId) {
-    const isServer = typeof window === "undefined";
     const endpoint = `/environments/${this.baseEnvironment}/collections/${collectionId}`;
     try {
-      if (isServer) {
-        const response = await this.fetchServerData(endpoint);
-        if (response.message) {
-          throw new Error(response.message);
-        }
-        return response.data.collection;
-      } else {
-        return await this.fetchClientData(endpoint);
+      const response = await this.fetchData(endpoint);
+      if (response.message) {
+        throw new Error(response.message);
       }
+      return response.data.collection;
     } catch (error) {
       if (error instanceof Error) {
         throw new Error(`Failed to fetch collection: ${error.message}`);
@@ -336,58 +149,43 @@ var Brease = class _Brease {
     }
   }
   async getEntryBySlug(collectionId, entrySlug, locale) {
-    const isServer = typeof window === "undefined";
     const endpoint = `/environments/${this.baseEnvironment}/collections/${collectionId}/entry?locale=${locale || "en"}&slug=${entrySlug}`;
     try {
-      if (isServer) {
-        const response = await this.fetchServerData(endpoint);
-        if (response.message) {
-          throw new Error(response.message);
-        }
-        return response.data.entry;
-      } else {
-        return await this.fetchClientData(endpoint);
+      const response = await this.fetchData(endpoint);
+      if (response.message) {
+        throw new Error(response.message);
       }
+      return response.data.entry;
     } catch (error) {
       if (error instanceof Error) {
         throw new Error(`Failed to fetch entry: ${error.message}`);
       }
-      throw new Error("Failed to fetch collection: Unknown error");
+      throw new Error("Failed to fetch entry: Unknown error");
     }
   }
   async getEntryByID(collectionId, entryId, locale) {
-    const isServer = typeof window === "undefined";
     const endpoint = `/environments/${this.baseEnvironment}/collections/${collectionId}/entry/${entryId}?locale=${locale || "en"}`;
     try {
-      if (isServer) {
-        const response = await this.fetchServerData(endpoint);
-        if (response.message) {
-          throw new Error(response.message);
-        }
-        return response.data.entry;
-      } else {
-        return await this.fetchClientData(endpoint);
+      const response = await this.fetchData(endpoint);
+      if (response.message) {
+        throw new Error(response.message);
       }
+      return response.data.entry;
     } catch (error) {
       if (error instanceof Error) {
         throw new Error(`Failed to fetch entry: ${error.message}`);
       }
-      throw new Error("Failed to fetch collection: Unknown error");
+      throw new Error("Failed to fetch entry: Unknown error");
     }
   }
   async getNavigation(navigationId) {
-    const isServer = typeof window === "undefined";
     const endpoint = `/environments/${this.baseEnvironment}/navigations/${navigationId}`;
     try {
-      if (isServer) {
-        const response = await this.fetchServerData(endpoint);
-        if (response.message) {
-          throw new Error(response.message);
-        }
-        return response.data.navigation;
-      } else {
-        return await this.fetchClientData(endpoint);
+      const response = await this.fetchData(endpoint);
+      if (response.message) {
+        throw new Error(response.message);
       }
+      return response.data.navigation;
     } catch (error) {
       if (error instanceof Error) {
         throw new Error(`Failed to fetch navigation: ${error.message}`);
@@ -396,18 +194,13 @@ var Brease = class _Brease {
     }
   }
   async getRedirects() {
-    const isServer = typeof window === "undefined";
     const endpoint = `/environments/${this.baseEnvironment}/redirects`;
     try {
-      if (isServer) {
-        const response = await this.fetchServerData(endpoint);
-        if (response.message) {
-          throw new Error(response.message);
-        }
-        return response.data.redirects;
-      } else {
-        return await this.fetchClientData(endpoint);
+      const response = await this.fetchData(endpoint);
+      if (response.message) {
+        throw new Error(response.message);
       }
+      return response.data.redirects;
     } catch (error) {
       if (error instanceof Error) {
         throw new Error(`Failed to fetch redirects: ${error.message}`);
@@ -506,65 +299,211 @@ function getBreasePreviewScriptContent() {
   `;
 }
 
-// src/ts/brease-ssr.ts
-var BreaseSSR = class {
-  static createClient(config) {
-    return Brease.createInstance(config);
+// src/ui/react/SectionToolbar/SectionEditButton/index.tsx
+var import_react = __toESM(require("react"));
+var import_jsx_runtime = require("react/jsx-runtime");
+function BreaseAction(action, data) {
+  if (typeof window !== "undefined" && window.parent) {
+    window.parent.postMessage(
+      {
+        action,
+        data: {
+          ...data,
+          scrollY: window.scrollY
+        }
+      },
+      "*"
+    );
   }
-  /**
-   * Get a page by its slug in SSR context
-   */
-  static async getPageBySlug(config, pageSlug, locale) {
-    const client = this.createClient(config);
-    return client.getPageBySlug(pageSlug, locale);
-  }
-  /**
-   * Get a page metadata by its slug in SSR context
-   */
-  static async getPageMetaBySlug(config, pageSlug, locale) {
-    const client = this.createClient(config);
-    return client.getPageMetaBySlug(pageSlug, locale);
-  }
-  /**
-   * Get a page by its ID in SSR context
-   */
-  static async getPageByID(config, pageId) {
-    const client = this.createClient(config);
-    return client.getPageByID(pageId);
-  }
-  /**
-   * Get navigation data in SSR context
-   */
-  static async getNavigation(config, navigationId) {
-    const client = this.createClient(config);
-    return client.getNavigation(navigationId);
-  }
-  /**
-   * Get collection data in SSR context
-   */
-  static async getCollection(config, collectionId) {
-    const client = this.createClient(config);
-    return client.getCollection(collectionId);
-  }
-  /**
-   * Get an entry by its slug in SSR context
-   */
-  static async getEntryBySlug(config, collectionId, entrySlug, locale) {
-    const client = this.createClient(config);
-    return client.getEntryBySlug(collectionId, entrySlug, locale);
-  }
-  /**
-   * Get an entry by its ID in SSR context
-   */
-  static async getEntryByID(config, collectionId, entryId, locale) {
-    const client = this.createClient(config);
-    return client.getEntryByID(collectionId, entryId, locale);
-  }
-  /**
-   * Get redirects data in SSR context
-   */
-  static async getRedirects(config) {
-    const client = this.createClient(config);
-    return client.getRedirects();
-  }
+}
+var BreaseEditButton = ({ id }) => {
+  const buttonRef = import_react.default.useRef(null);
+  import_react.default.useEffect(() => {
+    const handleClick = () => {
+      BreaseAction("BreaseEditSection", { uuid: id });
+    };
+    const button = buttonRef.current;
+    if (button) {
+      button.addEventListener("click", handleClick);
+    }
+    return () => {
+      if (button) {
+        button.removeEventListener("click", handleClick);
+      }
+    };
+  }, [id]);
+  return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
+    "button",
+    {
+      ref: buttonRef,
+      className: "brease-edit-button",
+      children: "Edit"
+    }
+  );
 };
+
+// src/ui/react/SectionToolbar/index.tsx
+var import_jsx_runtime2 = require("react/jsx-runtime");
+function SectionToolbar({ data }) {
+  return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "brease-section-toolbar", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "brease-section-title", children: data.name }) }),
+    /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "brease-toolbar-actions", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(BreaseEditButton, { id: data.page_section_uuid }) })
+  ] });
+}
+
+// src/ui/ts/SectionToolbar/SectionEditButton/index.ts
+function BreaseAction2(action, data) {
+  if (typeof window !== "undefined" && window.parent) {
+    window.parent.postMessage(
+      {
+        action,
+        data: {
+          ...data,
+          scrollY: window.scrollY
+        }
+      },
+      "*"
+    );
+  }
+}
+function createBreaseEditButton({ id }) {
+  const button = document.createElement("button");
+  button.textContent = "Edit";
+  button.className = "brease-edit-button";
+  button.addEventListener("click", () => {
+    BreaseAction2("BreaseEditSection", { uuid: id });
+  });
+  return button;
+}
+function insertBreaseEditButton(container, id) {
+  const button = createBreaseEditButton({ id });
+  container.appendChild(button);
+  return button;
+}
+
+// src/ui/ts/SectionToolbar/index.ts
+function createSectionToolbar(data) {
+  const container = document.createElement("div");
+  container.className = "brease-section-toolbar";
+  const titleContainer = document.createElement("div");
+  const title = document.createElement("span");
+  title.className = "brease-section-title";
+  title.textContent = data.name;
+  titleContainer.appendChild(title);
+  const actionsContainer = document.createElement("div");
+  actionsContainer.className = "brease-toolbar-actions";
+  const editButton = createBreaseEditButton({ id: data.page_section_uuid });
+  actionsContainer.appendChild(editButton);
+  container.appendChild(titleContainer);
+  container.appendChild(actionsContainer);
+  return container;
+}
+function insertSectionToolbar(parent, data) {
+  const toolbar = createSectionToolbar(data);
+  parent.appendChild(toolbar);
+  return toolbar;
+}
+
+// src/utils/react/printSections.ts
+var import_react2 = __toESM(require("react"));
+
+// src/utils/react/filterSections.ts
+function filterSections(page, componentMap) {
+  return page.sections.map((section) => {
+    if (componentMap[section.type]) {
+      return {
+        component: componentMap[section.type],
+        page_section_uuid: section.page_section_uuid,
+        section_uuid: section.uuid,
+        name: section.name,
+        data: section.elements
+      };
+    }
+    return null;
+  });
+}
+
+// src/utils/react/printSections.ts
+function printSections(page, componentMap, optionalData) {
+  const sections = filterSections(page, componentMap);
+  const isInIframe = typeof window !== "undefined" && window.self !== window.top;
+  return sections?.map((section, index) => {
+    if (section) {
+      if (isInIframe) {
+        return import_react2.default.createElement(
+          "figure",
+          {
+            key: index,
+            id: section.page_section_uuid,
+            className: "brease-section"
+          },
+          import_react2.default.createElement(SectionToolbar, { data: section }),
+          // Add overlays to disable interactivity
+          import_react2.default.createElement("div", {
+            className: "brease-preview-overlay"
+          }),
+          import_react2.default.createElement(section.component, { data: section.data, extra: optionalData || null })
+        );
+      } else {
+        return import_react2.default.createElement(
+          "figure",
+          {
+            key: index,
+            id: section.page_section_uuid,
+            className: "brease-section"
+          },
+          import_react2.default.createElement(section.component, { data: section.data, extra: optionalData || null })
+        );
+      }
+    }
+  });
+}
+
+// src/utils/ts/filterSections.ts
+function filterSectionsTS(page, componentMap) {
+  return page.sections.map((section) => {
+    if (componentMap[section.type]) {
+      return {
+        component: componentMap[section.type],
+        page_section_uuid: section.page_section_uuid,
+        section_uuid: section.uuid,
+        name: section.name,
+        data: section.elements
+      };
+    }
+    return null;
+  });
+}
+
+// src/utils/ts/printSections.ts
+function printSectionsTS(page, componentMap, options = {}) {
+  const { container, optionalData, enablePreview = true } = options;
+  const sections = filterSectionsTS(page, componentMap);
+  const isInIframe = typeof window !== "undefined" && window.self !== window.top;
+  const renderedSections = [];
+  sections.forEach((section, index) => {
+    if (section) {
+      const sectionElement = document.createElement("figure");
+      sectionElement.id = section.page_section_uuid;
+      sectionElement.className = "brease-section";
+      if (isInIframe && enablePreview) {
+        const toolbar = createSectionToolbar({
+          page_section_uuid: section.page_section_uuid,
+          name: section.name,
+          uuid: section.section_uuid
+        });
+        sectionElement.appendChild(toolbar);
+        const overlay = document.createElement("div");
+        overlay.className = "brease-preview-overlay";
+        sectionElement.appendChild(overlay);
+      }
+      const componentElement = section.component(section.data, optionalData || null);
+      sectionElement.appendChild(componentElement);
+      if (container) {
+        container.appendChild(sectionElement);
+      }
+      renderedSections.push(sectionElement);
+    }
+  });
+  return renderedSections;
+}

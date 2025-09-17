@@ -1,7 +1,9 @@
-import React from "react"
-import { Page } from "../types/types"
+import { Page, ComponentRenderer, FilteredSection } from "../../brease/types";
 
-export function filterSections(page: Page, componentMap: Record<string, React.ComponentType<any>>) {
+export function filterSectionsTS(
+  page: Page, 
+  componentMap: Record<string, ComponentRenderer>
+): (FilteredSection | null)[] {
   return page.sections.map((section) => {
     if (componentMap[section.type]) {
       return {
@@ -10,8 +12,8 @@ export function filterSections(page: Page, componentMap: Record<string, React.Co
         section_uuid: section.uuid,
         name: section.name,
         data: section.elements
-      }
+      };
     }
-    return null
-  })
+    return null;
+  });
 }
